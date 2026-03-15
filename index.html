@@ -1568,6 +1568,7 @@ async function _applyNewPasswordFromPasskeyChange(keepPasskey) {
       if (plain) e.encBody = await encryptStr(plain, newPw);
     }
   }
+
   const newVerifier = await buildVerifier(newPw);
   localStorage.setItem(vKey(_activeId,'verifier'), newVerifier);
   _masterPw = newPw;
@@ -1575,7 +1576,21 @@ async function _applyNewPasswordFromPasskeyChange(keepPasskey) {
 
   const newMethod = keepPasskey ? 'both' : 'password';
   localStorage.setItem(vKey(_activeId,'method'), newMethod);
-  if (!keepPasskey) localStorage.removeItem(vKey(_activeId,'pkcred'));
+
+  if (keepPasskey) {
+    // Re-wrap the NEW password under the existing passkey credential.
+    // The passkey credId stays the same — we just update what it unlocks.
+    const pkData = JSON.parse(localStorage.getItem(vKey(_activeId,'pkcred'))||'null');
+    if (pkData) {
+      const newWrapped = await wrapSecretWithCred(newPw, pkData.credId);
+      localStorage.setItem(vKey(_activeId,'pkcred'), JSON.stringify({
+        credId: pkData.credId,
+        wrappedSecret: newWrapped
+      }));
+    }
+  } else {
+    localStorage.removeItem(vKey(_activeId,'pkcred'));
+  }
 
   // Update index
   const idx  = getIndex();
