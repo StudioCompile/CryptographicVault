@@ -62,6 +62,8 @@
   #topbar .spacer{flex:1}
   #lock-btn{font-family:var(--sans);font-weight:600;font-size:12px;letter-spacing:1px;text-transform:uppercase;padding:7px 16px;background:transparent;border:1px solid var(--border2);color:var(--muted);cursor:pointer;transition:all .15s}
   #lock-btn:hover{color:var(--red);border-color:var(--red)}
+  #share-btn{font-family:var(--sans);font-weight:600;font-size:12px;letter-spacing:1px;text-transform:uppercase;padding:7px 16px;background:transparent;border:1px solid var(--border2);color:var(--muted);cursor:pointer;transition:all .15s}
+  #share-btn:hover{color:var(--amber);border-color:var(--amber)}
 
   #content{padding:28px 32px;max-width:1000px}
   .tab-panel{display:none}
@@ -141,8 +143,8 @@
 
 <div id="lockscreen">
   <div class="lock-icon">🔐</div>
-  <h2>Enter Your Password</h2>
-  <p>Everything in here — your 2FA codes and private notes — is fully encrypted and stored only on your device. Your password is never saved anywhere, so even if someone stole your data, they couldn't read a single thing without it. With a strong password, it would take longer than the age of the universe to crack.</p>
+  <h2 id="lock-title">Enter Your Password</h2>
+  <p id="lock-desc">Everything in here — your 2FA codes and private notes — is fully encrypted and stored only on your device. Your password is never saved anywhere, so even if someone stole your data, they couldn't read a single thing without it. With a strong password, it would take longer than the age of the universe to crack.</p>
   <div class="lock-form">
     <input type="password" id="master-pw" placeholder="Enter your password…"
       autocomplete="off" autocorrect="off" autocapitalize="off"
@@ -161,6 +163,7 @@
     <button class="tab-btn" onclick="switchTab('notes',this)">📝 Private Notes</button>
     <div class="spacer"></div>
     <button id="lock-btn" onclick="lockVault()">🔒 LOCK VAULT</button>
+    <button id="share-btn" onclick="openShareModal()">🔗 SHARE LINK</button>
   </div>
   <div id="content">
     <div id="tab-totp" class="tab-panel active">
@@ -312,6 +315,34 @@
     </div>
   </div>
 </div>
+
+<!-- Share Link -->
+<div class="modal-overlay" id="modal-share-link">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('share-link')">✕</button>
+    <h3>Share / Transfer Vault</h3>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.7">
+      This link contains your <strong style="color:var(--text)">fully encrypted</strong> vault.
+      Anyone who opens it still needs your password — without it the data is unreadable.
+      The link never touches any server — it's all in the <code style="color:var(--amber)">#hash</code> part of the URL.
+    </p>
+    <div class="form-row">
+      <label>Your Vault Link</label>
+      <textarea id="share-url" rows="4" readonly
+        style="font-size:11px;word-break:break-all;cursor:text;resize:none"
+        onclick="this.select()"></textarea>
+    </div>
+    <div style="font-size:10px;color:var(--muted);margin-bottom:4px">
+      ⚠ Keep this link private — it contains your encrypted data. Only share it with yourself (e.g. bookmark it, text it to your other device).
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('share-link')">CLOSE</button>
+      <button class="btn btn-primary" onclick="copyShareLink()">⎘ COPY LINK</button>
+    </div>
+  </div>
+</div>
+
+
 
 <div id="toast"></div>
 
@@ -529,8 +560,28 @@ async function decryptEntry(blob, password) {
 }
 
 // ── Storage ──────────────────────────────────────────────────────────────
+// Data lives in localStorage AND can be encoded into the URL hash.
+// The hash (#data=...) is NEVER sent to any server — it stays in the browser.
+// Format: #data=<base64url( JSON({v, verifier, entries:[...]}) )>
+
+function packVault(verifier, blobs) {
+  const obj = { v: 1, verifier, entries: blobs };
+  const json = JSON.stringify(obj);
+  // Base64url encode (URL-safe, no padding)
+  return btoa(unescape(encodeURIComponent(json)))
+    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+}
+
+function unpackVault(encoded) {
+  try {
+    const json = decodeURIComponent(escape(atob(
+      encoded.replace(/-/g, '+').replace(/_/g, '/')
+    )));
+    return JSON.parse(json);
+  } catch { return null; }
+}
+
 async function persistEntries() {
-  // Each entry encrypted independently — no shared key material between blobs
   const blobs = await Promise.all(_entries.map(e => encryptEntry(e, _masterPw)));
   localStorage.setItem(LS_ENTRIES, JSON.stringify(blobs));
 }
@@ -544,6 +595,52 @@ async function loadEntries(password) {
 }
 
 const hasVault = () => !!localStorage.getItem(LS_VERIFIER);
+
+// ── URL import ────────────────────────────────────────────────────────────
+// If the page loads with #data=... in the URL, offer to import that vault.
+function getHashData() {
+  const m = location.hash.match(/^#data=(.+)$/);
+  return m ? m[1] : null;
+}
+
+function importFromHash(encoded) {
+  const obj = unpackVault(encoded);
+  if (!obj || !obj.verifier || !Array.isArray(obj.entries)) return false;
+  localStorage.setItem(LS_VERIFIER, obj.verifier);
+  localStorage.setItem(LS_ENTRIES, JSON.stringify(obj.entries));
+  return true;
+}
+
+// ── Share-link mode ───────────────────────────────────────────────────────
+// When #data= is in the URL, we're in "shared vault" mode.
+// The UI strips down to just a password field — no create button, no description.
+// After unlock, entries are loaded from the URL data and saved to localStorage.
+
+let _shareLinkMode = false;
+let _shareLinkData = null; // the raw encoded string from the URL
+
+// Called on page load
+function checkForImport() {
+  const encoded = getHashData();
+  if (!encoded || encoded.length < 10) return;
+  const obj = unpackVault(encoded);
+  if (!obj || !obj.verifier || !Array.isArray(obj.entries)) return;
+
+  // We have valid share-link data — switch to share-link mode
+  _shareLinkMode = true;
+  _shareLinkData = encoded;
+
+  // Swap the lockscreen UI to minimal mode
+  document.getElementById('lock-title').textContent = 'Enter Password to Open';
+  document.getElementById('lock-desc').textContent  = 'Someone shared a vault link with you. Enter the password to open it.';
+  document.getElementById('lock-desc').style.maxWidth = '340px';
+  document.getElementById('create-vault-btn').style.display = 'none';
+  document.getElementById('unlock-btn').textContent = 'OPEN VAULT';
+
+  // Pre-load the verifier from URL data so unlock works even with no localStorage
+  localStorage.setItem(LS_VERIFIER, obj.verifier);
+  localStorage.setItem(LS_ENTRIES,  JSON.stringify(obj.entries));
+}
 
 // ═══════════════════════════════════════════════════════════════════════
 //  LOCK / UNLOCK
@@ -571,7 +668,12 @@ async function unlock() {
   _entries  = await loadEntries(pw);
   _masterPw = pw;
 
-  // Wipe input immediately after use
+  // If we came from a share link, clean the hash out of the address bar
+  // so the long data string doesn't sit there permanently
+  if (_shareLinkMode) {
+    history.replaceState(null, '', location.pathname + location.search);
+  }
+
   document.getElementById('master-pw').value = '';
   setBusy(false);
   setLockMsg('', false);
@@ -582,6 +684,9 @@ async function createVault() {
   const pw  = document.getElementById('new-pw').value;
   const pw2 = document.getElementById('new-pw2').value;
   const err = document.getElementById('create-err');
+  // Clear any previous error
+  err.textContent = ''; err.classList.remove('show');
+
   if (pw.length < 12) { showErr(err, 'Password needs to be at least 12 characters.'); return; }
   if (pw !== pw2)     { showErr(err, "Passwords don't match — try again."); return; }
   if (hasVault()) {
@@ -589,21 +694,29 @@ async function createVault() {
     localStorage.removeItem(LS_VERIFIER);
     localStorage.removeItem(LS_ENTRIES);
   }
-  document.getElementById('create-btn').disabled = true;
-  document.getElementById('create-btn').textContent = 'SETTING UP…';
 
-  const verifier = await buildVerifier(pw);
-  localStorage.setItem(LS_VERIFIER, verifier);
-  _masterPw = pw;
-  _entries  = [];
-  await persistEntries();
+  const btn = document.getElementById('create-btn');
+  btn.disabled = true;
+  btn.textContent = 'SETTING UP…';
 
-  document.getElementById('new-pw').value  = '';
-  document.getElementById('new-pw2').value = '';
-  closeModal('create-vault');
-  document.getElementById('create-btn').disabled = false;
-  document.getElementById('create-btn').textContent = 'CREATE VAULT';
-  showApp();
+  try {
+    const verifier = await buildVerifier(pw);
+    localStorage.setItem(LS_VERIFIER, verifier);
+    _masterPw = pw;
+    _entries  = [];
+    await persistEntries();
+
+    document.getElementById('new-pw').value  = '';
+    document.getElementById('new-pw2').value = '';
+    closeModal('create-vault');
+    btn.disabled = false;
+    btn.textContent = 'CREATE VAULT';
+    showApp();
+  } catch (e) {
+    btn.disabled = false;
+    btn.textContent = 'CREATE VAULT';
+    showErr(err, 'Something went wrong: ' + e.message);
+  }
 }
 
 function lockVault() {
@@ -929,6 +1042,34 @@ if (!hasVault()) {
   const b=document.getElementById('create-vault-btn');
   b.style.borderColor='var(--amber)'; b.style.color='var(--amber)';
 }
+
+// ── Share / Transfer ──────────────────────────────────────────────────────
+
+function openShareModal() {
+  const url = location.href.split('#')[0] + '#data=' + (getHashData() || '');
+  // Rebuild fresh from localStorage to make sure it's current
+  const verifier = localStorage.getItem(LS_VERIFIER) || '';
+  const entries  = localStorage.getItem(LS_ENTRIES)  || '[]';
+  const packed   = packVault(verifier, JSON.parse(entries));
+  const fullUrl  = location.href.split('#')[0] + '#data=' + packed;
+  document.getElementById('share-url').value = fullUrl;
+  openModal('share-link');
+}
+
+async function copyShareLink() {
+  const url = document.getElementById('share-url').value;
+  try {
+    await navigator.clipboard.writeText(url);
+    toast('Link copied! Open it on your other device.');
+  } catch {
+    document.getElementById('share-url').select();
+    toast('Could not auto-copy — select all and copy manually.');
+  }
+}
+
+// Run on load — checks if URL has vault data to import
+// Wrapped in setTimeout to ensure DOM is fully ready first
+setTimeout(checkForImport, 0);
 </script>
 </body>
 </html>
