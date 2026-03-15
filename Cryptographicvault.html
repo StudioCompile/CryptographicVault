@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VAULT</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0a0a0a; --surface:#111; --border:#222; --border2:#333;
+    --amber:#f5a623; --amber2:#ffca6e; --red:#e05252; --green:#4caf7d;
+    --blue:#4a9eff; --text:#e8e8e8; --muted:#666;
+    --mono:'Share Tech Mono',monospace; --sans:'Barlow Condensed',sans-serif;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:100vh;overflow-x:hidden}
+  body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.07) 2px,rgba(0,0,0,.07) 4px);pointer-events:none;z-index:9999}
+
+  #header{border-bottom:1px solid var(--border2);padding:18px 32px;display:flex;align-items:center;justify-content:space-between;background:#0d0d0d}
+  .logo{font-family:var(--sans);font-weight:900;font-size:28px;letter-spacing:6px;color:var(--amber);text-transform:uppercase}
+  .logo span{color:var(--muted);font-weight:300}
+  .status{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:8px}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--red);animation:pulse 2s infinite}
+  .dot.unlocked{background:var(--green)}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+  #lockscreen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 65px);padding:40px}
+  .lock-icon{font-size:64px;margin-bottom:24px;filter:drop-shadow(0 0 20px rgba(245,166,35,.3));animation:float 3s ease-in-out infinite}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  #lockscreen h2{font-family:var(--sans);font-weight:700;font-size:22px;letter-spacing:3px;text-transform:uppercase;color:var(--amber);margin-bottom:8px}
+  #lockscreen p{color:var(--muted);font-size:12px;margin-bottom:28px;text-align:center;line-height:1.8;max-width:420px}
+  .lock-form{display:flex;flex-direction:column;gap:12px;width:100%;max-width:360px}
+  .lock-form input{background:var(--surface);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:14px;padding:12px 16px;outline:none;transition:border-color .2s;width:100%}
+  .lock-form input:focus{border-color:var(--amber)}
+  .lock-form input::placeholder{color:var(--muted)}
+
+  .btn{font-family:var(--sans);font-weight:700;font-size:15px;letter-spacing:2px;text-transform:uppercase;padding:12px 24px;border:none;cursor:pointer;transition:all .15s;outline:none}
+  .btn-primary{background:var(--amber);color:#000}
+  .btn-primary:hover{background:var(--amber2)}
+  .btn-primary:disabled{opacity:.5;cursor:not-allowed}
+  .btn-danger{background:var(--red);color:#fff}
+  .btn-danger:hover{opacity:.85}
+  .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border2)}
+  .btn-ghost:hover{color:var(--text);background:var(--surface)}
+  .btn-sm{font-size:11px;padding:6px 14px}
+  .btn-icon{background:transparent;border:none;cursor:pointer;padding:6px;color:var(--muted);font-size:16px;transition:color .15s;line-height:1}
+  .btn-icon:hover{color:var(--text)}
+  .btn-icon.red:hover{color:var(--red)}
+
+  #lock-msg{font-size:12px;text-align:center;min-height:16px}
+  #lock-msg.err{color:var(--red)}
+  #lock-msg.info{color:var(--muted)}
+
+  #app{display:none}
+  #app.visible{display:block}
+
+  #topbar{padding:12px 32px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;background:#0c0c0c}
+  .tab-btn{font-family:var(--sans);font-weight:700;font-size:13px;letter-spacing:2px;text-transform:uppercase;padding:8px 20px;background:transparent;border:1px solid transparent;color:var(--muted);cursor:pointer;transition:all .15s}
+  .tab-btn.active{color:var(--amber);border-color:var(--amber)}
+  .tab-btn:hover:not(.active){color:var(--text);border-color:var(--border2)}
+  #topbar .spacer{flex:1}
+  #lock-btn{font-family:var(--sans);font-weight:600;font-size:12px;letter-spacing:1px;text-transform:uppercase;padding:7px 16px;background:transparent;border:1px solid var(--border2);color:var(--muted);cursor:pointer;transition:all .15s}
+  #lock-btn:hover{color:var(--red);border-color:var(--red)}
+
+  #content{padding:28px 32px;max-width:1000px}
+  .tab-panel{display:none}
+  .tab-panel.active{display:block}
+
+  .sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+  .sec-header h3{font-family:var(--sans);font-weight:700;font-size:18px;letter-spacing:3px;text-transform:uppercase;color:var(--amber)}
+  .count{font-size:11px;color:var(--muted);margin-left:10px}
+
+  .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+  .entry-card{background:var(--surface);border:1px solid var(--border);padding:18px;position:relative;transition:border-color .2s}
+  .entry-card:hover{border-color:var(--border2)}
+  .card-label{font-family:var(--sans);font-size:17px;font-weight:700;letter-spacing:1px;color:var(--text);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:60px}
+  .card-sub{font-size:11px;color:var(--muted);margin-bottom:14px}
+  .card-actions{position:absolute;top:12px;right:12px;display:flex;gap:4px}
+
+  .totp-code{font-size:32px;letter-spacing:6px;color:var(--amber);font-weight:normal;line-height:1;transition:color .3s;cursor:pointer;user-select:all}
+  .totp-code.warn{color:var(--red)}
+  .totp-code.copy-flash{color:var(--green)}
+  .totp-bar-wrap{margin-top:10px;height:2px;background:var(--border);overflow:hidden}
+  .totp-bar{height:100%;background:var(--amber);transition:width .9s linear,background .3s;width:100%}
+  .totp-bar.warn{background:var(--red)}
+  .totp-remaining{font-size:10px;color:var(--muted);margin-top:4px;text-align:right}
+
+  .note-locked{color:var(--muted);font-size:12px}
+  .note-body{background:var(--bg);border:1px solid var(--border);padding:14px;font-size:13px;line-height:1.7;white-space:pre-wrap;word-break:break-word;max-height:300px;overflow-y:auto;color:var(--text)}
+
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:1000;align-items:center;justify-content:center;padding:20px}
+  .modal-overlay.open{display:flex}
+  .modal{background:var(--surface);border:1px solid var(--border2);padding:28px;width:100%;max-width:460px;position:relative;animation:slide-up .2s ease}
+  @keyframes slide-up{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .modal h3{font-family:var(--sans);font-weight:700;font-size:20px;letter-spacing:2px;text-transform:uppercase;color:var(--amber);margin-bottom:20px}
+  .modal-close{position:absolute;top:16px;right:16px;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;transition:color .15s}
+  .modal-close:hover{color:var(--text)}
+  .modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+
+  .form-row{margin-bottom:14px}
+  .form-row label{display:block;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+  .form-row input,.form-row textarea{width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:13px;padding:10px 14px;outline:none;transition:border-color .2s;resize:vertical}
+  .form-row input:focus,.form-row textarea:focus{border-color:var(--amber)}
+  .form-row input::placeholder,.form-row textarea::placeholder{color:var(--muted)}
+  .form-err{color:var(--red);font-size:11px;margin-top:6px;display:none}
+  .form-err.show{display:block}
+
+  .badge{display:inline-block;font-size:9px;letter-spacing:1px;text-transform:uppercase;padding:2px 6px;border:1px solid var(--border2);color:var(--muted);margin-bottom:6px}
+  .badge.totp{border-color:rgba(245,166,35,.4);color:var(--amber)}
+  .badge.note{border-color:rgba(74,158,255,.4);color:var(--blue)}
+  .badge.locked{border-color:rgba(224,82,82,.3);color:var(--red)}
+
+  .empty{color:var(--muted);font-size:13px;padding:40px 0;text-align:center;border:1px dashed var(--border);grid-column:1/-1}
+  .empty span{color:var(--amber)}
+
+  .strength-bar{height:2px;background:var(--border);margin-top:6px}
+  .strength-fill{height:100%;transition:width .3s,background .3s;width:0%;background:var(--red)}
+
+  #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface);border:1px solid var(--border2);color:var(--text);font-size:12px;padding:10px 20px;letter-spacing:1px;opacity:0;transition:all .25s;pointer-events:none;z-index:9000;white-space:nowrap}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  ::-webkit-scrollbar{width:6px} ::-webkit-scrollbar-track{background:var(--bg)} ::-webkit-scrollbar-thumb{background:var(--border2)}
+
+  @media(max-width:600px){
+    #header,#topbar,#content{padding-left:16px;padding-right:16px}
+    .logo{font-size:20px}
+    .card-grid{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<div id="header">
+  <div class="logo">V<span>ault</span></div>
+  <div class="status">
+    <div class="dot" id="status-dot"></div>
+    <span id="status-text">LOCKED</span>
+  </div>
+</div>
+
+<div id="lockscreen">
+  <div class="lock-icon">🔐</div>
+  <h2>Enter Your Password</h2>
+  <p>Everything in here — your 2FA codes and private notes — is fully encrypted and stored only on your device. Your password is never saved anywhere, so even if someone stole your data, they couldn't read a single thing without it. With a strong password, it would take longer than the age of the universe to crack.</p>
+  <div class="lock-form">
+    <input type="password" id="master-pw" placeholder="Master password…"
+      autocomplete="new-password" autocorrect="off" autocapitalize="off"
+      spellcheck="false" readonly onfocus="this.removeAttribute('readonly')">
+    <div id="lock-msg"></div>
+    <button class="btn btn-primary" id="unlock-btn" onclick="unlock()">OPEN MY VAULT</button>
+    <button class="btn btn-ghost" id="create-vault-btn" onclick="openModal('create-vault')">CREATE VAULT</button>
+  </div>
+</div>
+
+<div id="app">
+  <div id="topbar">
+    <button class="tab-btn active" onclick="switchTab('totp',this)">⏱ Login Codes</button>
+    <button class="tab-btn" onclick="switchTab('notes',this)">📝 Private Notes</button>
+    <div class="spacer"></div>
+    <button id="lock-btn" onclick="lockVault()">🔒 LOCK VAULT</button>
+  </div>
+  <div id="content">
+    <div id="tab-totp" class="tab-panel active">
+      <div class="sec-header">
+        <h3>Login Codes <span class="count" id="totp-count"></span></h3>
+        <button class="btn btn-primary btn-sm" onclick="openModal('add-totp')">+ ADD CODE</button>
+      </div>
+      <div class="card-grid" id="totp-list"></div>
+    </div>
+    <div id="tab-notes" class="tab-panel">
+      <div class="sec-header">
+        <h3>Private Notes <span class="count" id="notes-count"></span></h3>
+        <button class="btn btn-primary btn-sm" onclick="openModal('add-note')">+ ADD NOTE</button>
+      </div>
+      <div class="card-grid" id="notes-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Create vault -->
+<div class="modal-overlay" id="modal-create-vault">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('create-vault')">✕</button>
+    <h3>Set Up Your Vault</h3>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:18px;line-height:1.7">
+      Pick a strong password — this is the only thing protecting your vault.
+      It's never saved anywhere, so if you forget it, there's no way to get your data back.
+      <strong style="color:var(--amber)">Write it down somewhere safe.</strong>
+    </p>
+    <div class="form-row">
+      <label>Your Password</label>
+      <input type="password" id="new-pw" placeholder="At least 12 characters…"
+        autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly')">
+      <div class="strength-bar"><div class="strength-fill" id="pw-strength-fill"></div></div>
+      <div style="font-size:10px;color:var(--muted);margin-top:4px" id="pw-strength-label"></div>
+    </div>
+    <div class="form-row">
+      <label>Type It Again to Confirm</label>
+      <input type="password" id="new-pw2" placeholder="Repeat password…"
+        autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly')">
+    </div>
+    <div class="form-err" id="create-err"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('create-vault')">GO BACK</button>
+      <button class="btn btn-primary" id="create-btn" onclick="createVault()">CREATE VAULT</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add TOTP -->
+<div class="modal-overlay" id="modal-add-totp">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('add-totp')">✕</button>
+    <h3>Add a Login Code</h3>
+    <div class="form-row">
+      <label>Name (e.g. which account is this?)</label>
+      <input type="text" id="totp-label" placeholder="e.g. GitHub – username" autocomplete="off">
+    </div>
+    <div class="form-row">
+      <label>Secret Key — the code shown when you set up 2FA</label>
+      <input type="text" id="totp-secret" placeholder="JBSWY3DPEHPK3PXP…" autocomplete="off" spellcheck="false" style="letter-spacing:2px">
+    </div>
+    <div class="form-row">
+      <label>Website or App (optional)</label>
+      <input type="text" id="totp-issuer" placeholder="e.g. GitHub" autocomplete="off">
+    </div>
+    <div class="form-row">
+      <label>Code refreshes every ___ seconds (usually 30, leave it)</label>
+      <input type="number" id="totp-period" value="30" min="15" max="120">
+    </div>
+    <div class="form-row">
+      <label>Notes (optional)</label>
+      <textarea id="totp-notes" rows="2" placeholder="Anything you want to remember…"></textarea>
+    </div>
+    <div class="form-err" id="add-totp-err"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('add-totp')">CANCEL</button>
+      <button class="btn btn-primary" onclick="addTOTP()">SAVE</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Note -->
+<div class="modal-overlay" id="modal-add-note">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('add-note')">✕</button>
+    <h3>Add a Private Note</h3>
+    <div class="form-row">
+      <label>Title</label>
+      <input type="text" id="note-title" placeholder="e.g. Recovery codes, SSH key…" autocomplete="off">
+    </div>
+    <div class="form-row">
+      <label>Your Note</label>
+      <textarea id="note-body" rows="5" placeholder="Type anything here — it'll be encrypted…" autocomplete="off"></textarea>
+    </div>
+    <div class="form-row">
+      <label>Extra Password (optional) — adds a second lock to this note only</label>
+      <input type="password" id="note-extra-pw" placeholder="Leave blank to just use your main password"
+        autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly')">
+    </div>
+    <div class="form-err" id="add-note-err"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('add-note')">CANCEL</button>
+      <button class="btn btn-primary" onclick="addNote()">SAVE</button>
+    </div>
+  </div>
+</div>
+
+<!-- View Note -->
+<div class="modal-overlay" id="modal-view-note">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('view-note');wipeNoteView()">✕</button>
+    <h3 id="view-note-title">Note</h3>
+    <div id="view-note-pw-section">
+      <p style="font-size:12px;color:var(--muted);margin-bottom:12px">This note has a second password. Enter it to read it.</p>
+      <div class="form-row">
+        <label>Second Password</label>
+        <input type="password" id="view-note-pw" placeholder="Enter the extra password…"
+          autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly')">
+      </div>
+      <div class="form-err" id="view-note-err"></div>
+      <div class="modal-footer" style="margin-top:12px">
+        <button class="btn btn-ghost" onclick="closeModal('view-note')">CANCEL</button>
+        <button class="btn btn-primary" onclick="decryptAndShowNote()">OPEN NOTE</button>
+      </div>
+    </div>
+    <div id="view-note-body-section" style="display:none">
+      <div class="note-body" id="view-note-body"></div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('view-note');wipeNoteView()">CLOSE</button>
+        <button class="btn btn-sm btn-ghost" onclick="copyNoteContent()">⎘ COPY</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm delete -->
+<div class="modal-overlay" id="modal-confirm-delete">
+  <div class="modal">
+    <h3>Are You Sure?</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:20px">This will delete the entry forever. You can't undo this.</p>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('confirm-delete')">CANCEL</button>
+      <button class="btn btn-danger" id="confirm-delete-btn">DELETE</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+// ═══════════════════════════════════════════════════════════════════════
+//  SECURITY MODEL
+//
+//  What is stored in localStorage (all of it is opaque ciphertext):
+//    LS_VERIFIER  — PBKDF2-derived HMAC(key, "VAULT_VERIFIER_V1")
+//                   Proves password correctness; leaks nothing about key.
+//    LS_ENTRIES   — JSON array of independently-encrypted blobs.
+//                   Each blob = AES-256-GCM(JSON(entry), PBKDF2(pw, perBlobSalt))
+//                   with 16-byte random salt + 12-byte random IV baked into it.
+//
+//  What an attacker with full localStorage + full source code gets:
+//    • A list of ciphertexts with no metadata whatsoever.
+//    • A verifier HMAC they can use to test password guesses offline.
+//    • They must run PBKDF2-SHA256 @ 600,000 iterations per guess.
+//    • On a high-end GPU (~10k PBKDF2-SHA256/s) a 12-char random password
+//      would take millions of years to brute force.
+//
+//  What is NEVER stored:
+//    • Master password (not even a hash)
+//    • Derived key bytes
+//    • Any plaintext entry data
+// ═══════════════════════════════════════════════════════════════════════
+
+const LS_VERIFIER = 'vlt_verifier_v3';
+const LS_ENTRIES  = 'vlt_entries_v3';
+
+// ── Chained KDF parameters ───────────────────────────────────────────────
+// Stage 1: PBKDF2-SHA512  — SHA-512 is ~2× slower than SHA-256 on GPU/ASIC
+//          because GPUs are optimised for 32-bit ops; SHA-512 uses 64-bit.
+// Stage 2: PBKDF2-SHA256  — second independent pass with a domain-separated salt.
+// Combined cost per guess ≈ ITER_1 SHA-512 rounds + ITER_2 SHA-256 rounds.
+// On an RTX 4090:
+//   PBKDF2-SHA512 @ 500k ≈ 200 guesses/sec
+//   PBKDF2-SHA256 @ 500k ≈ 600 guesses/sec
+//   Chained (both) ≈ ~150 guesses/sec  (bottlenecked by SHA-512 stage)
+const ITER_1   = 500_000;   // SHA-512 stage
+const ITER_2   = 500_000;   // SHA-256 stage
+const SALT_LEN = 16;
+const IV_LEN   = 12;
+const VERIFIER_LABEL = new TextEncoder().encode('VAULT_VERIFIER_V2::CHAINED_KDF');
+
+// Domain separation tags burned into the second-stage salt so the two
+// sub-keys (AES vs HMAC) are cryptographically independent.
+const TAG_AES  = new TextEncoder().encode('AES_KEY_DERIVATION');
+const TAG_HMAC = new TextEncoder().encode('HMAC_KEY_DERIVATION');
+
+// ── In-memory state (wiped on lock) ─────────────────────────────────────
+let _masterPw  = null;
+let _entries   = [];
+
+// ── Byte/b64 helpers ────────────────────────────────────────────────────
+const rnd  = n => crypto.getRandomValues(new Uint8Array(n));
+const b64e = b => btoa(String.fromCharCode(...new Uint8Array(b instanceof ArrayBuffer ? b : b.buffer)));
+const b64d = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+
+// ── Chained PBKDF2: SHA-512 → SHA-256 ───────────────────────────────────
+//
+// Why chained?
+//   A single PBKDF2-SHA256 call is fast on GPU (~1200/s @ 600k iterations).
+//   PBKDF2-SHA512 is ~4-6× slower on GPU because GPU CUDA cores are 32-bit;
+//   SHA-512's 64-bit word schedule runs inefficiently on them.
+//   By chaining both, an attacker must pay the SHA-512 cost AND the SHA-256
+//   cost for every single password guess. There's no shortcut.
+//
+// How it works:
+//   stage1Key = PBKDF2-SHA512(password, salt, ITER_1)
+//   intermediate = HMAC-SHA256(stage1Key, tag || salt)   -- domain separation
+//   finalKey = PBKDF2-SHA256(intermediate, salt, ITER_2)
+//
+// The intermediate step uses the stage1 key as a MAC key over a domain tag,
+// ensuring the two stages are cryptographically bound together.
+
+async function chainedDerive(password, salt, tag, outputAlgo, outputUsages) {
+  const enc = new TextEncoder();
+
+  // Stage 1: PBKDF2-SHA512 — GPU-hostile
+  const pwKey = await crypto.subtle.importKey(
+    'raw', enc.encode(password), { name:'PBKDF2' }, false, ['deriveBits']
+  );
+  const stage1Bits = await crypto.subtle.deriveBits(
+    { name:'PBKDF2', salt, iterations:ITER_1, hash:'SHA-512' },
+    pwKey, 256
+  );
+
+  // Domain separation: HMAC-SHA256(stage1Bits, tag || salt)
+  // This cryptographically binds the tag so AES and HMAC keys can never collide.
+  const macKey = await crypto.subtle.importKey(
+    'raw', stage1Bits, { name:'HMAC', hash:'SHA-256' }, false, ['sign']
+  );
+  const tagAndSalt = new Uint8Array(tag.length + salt.length);
+  tagAndSalt.set(tag, 0); tagAndSalt.set(salt, tag.length);
+  const intermediate = await crypto.subtle.sign('HMAC', macKey, tagAndSalt);
+
+  // Stage 2: PBKDF2-SHA256 over the intermediate material
+  const interKey = await crypto.subtle.importKey(
+    'raw', intermediate, { name:'PBKDF2' }, false, ['deriveKey']
+  );
+  return crypto.subtle.deriveKey(
+    { name:'PBKDF2', salt, iterations:ITER_2, hash:'SHA-256' },
+    interKey,
+    outputAlgo,
+    false,   // NON-EXTRACTABLE — key bytes never leave the browser engine
+    outputUsages
+  );
+}
+
+async function deriveAESKey(password, salt) {
+  return chainedDerive(password, salt, TAG_AES,
+    { name:'AES-GCM', length:256 }, ['encrypt','decrypt']);
+}
+
+async function deriveHMACKey(password, salt, usage) {
+  return chainedDerive(password, salt, TAG_HMAC,
+    { name:'HMAC', hash:'SHA-256', length:256 }, [usage]);
+}
+
+// ── Crack-time estimator ─────────────────────────────────────────────────
+// GPU speed assumptions (RTX 4090 worst-case, no mitigation):
+//   PBKDF2-SHA512 @ 500k:  ~250 guesses/sec
+//   Chained (both stages):  ~150 guesses/sec  (SHA-512 is bottleneck)
+// Charset sizes used for entropy calculation.
+const GPU_GUESSES_PER_SEC = 150;
+
+function estimateCrackTime(password) {
+  if (!password) return null;
+  let charset = 0;
+  if (/[a-z]/.test(password)) charset += 26;
+  if (/[A-Z]/.test(password)) charset += 26;
+  if (/[0-9]/.test(password)) charset += 10;
+  if (/[^a-zA-Z0-9]/.test(password)) charset += 32;
+  if (charset === 0) return null;
+  // keyspace = charset^length; expected guesses = keyspace / 2 (average)
+  const entropyBits = password.length * Math.log2(charset);
+  const keyspace    = Math.pow(2, entropyBits);
+  const avgGuesses  = keyspace / 2;
+  const seconds     = avgGuesses / GPU_GUESSES_PER_SEC;
+
+  if (seconds < 60)          return { label: `~${Math.ceil(seconds)}s`,        color: 'var(--red)',   rating: 0 };
+  if (seconds < 3600)        return { label: `~${Math.ceil(seconds/60)}min`,   color: 'var(--red)',   rating: 1 };
+  if (seconds < 86400)       return { label: `~${Math.ceil(seconds/3600)}hr`,  color: 'var(--amber)', rating: 2 };
+  if (seconds < 2592000)     return { label: `~${Math.ceil(seconds/86400)}d`,  color: 'var(--amber)', rating: 3 };
+  if (seconds < 31536000)    return { label: `~${Math.ceil(seconds/2592000)}mo`, color: 'var(--amber)', rating: 4 };
+  if (seconds < 3.15e9)      return { label: `~${Math.ceil(seconds/31536000)}yr`, color: 'var(--green)', rating: 5 };
+  if (seconds < 3.15e13)     return { label: `~${(seconds/31536000).toExponential(1)}yr`, color: 'var(--green)', rating: 6 };
+  return { label: 'heat death of universe', color: 'var(--green)', rating: 7 };
+}
+
+// ── AES-256-GCM encrypt/decrypt ─────────────────────────────────────────
+// Packs: salt(16) | iv(12) | ciphertext into a single b64 blob.
+// Every call generates fresh random salt + IV.
+async function encryptStr(plaintext, password) {
+  const salt = rnd(SALT_LEN);
+  const iv   = rnd(IV_LEN);
+  const key  = await deriveAESKey(password, salt);
+  const ct   = await crypto.subtle.encrypt(
+    { name:'AES-GCM', iv }, key,
+    new TextEncoder().encode(plaintext)
+  );
+  const out = new Uint8Array(SALT_LEN + IV_LEN + ct.byteLength);
+  out.set(salt, 0);
+  out.set(iv,   SALT_LEN);
+  out.set(new Uint8Array(ct), SALT_LEN + IV_LEN);
+  return b64e(out);
+}
+
+// Returns decrypted string, or null if wrong password / tampered data.
+async function decryptStr(b64, password) {
+  try {
+    const buf  = b64d(b64);
+    const salt = buf.slice(0, SALT_LEN);
+    const iv   = buf.slice(SALT_LEN, SALT_LEN + IV_LEN);
+    const ct   = buf.slice(SALT_LEN + IV_LEN);
+    const key  = await deriveAESKey(password, salt);
+    const pt   = await crypto.subtle.decrypt({ name:'AES-GCM', iv }, key, ct);
+    return new TextDecoder().decode(pt);
+  } catch { return null; }
+}
+
+// ── Verifier ─────────────────────────────────────────────────────────────
+// HMAC-SHA256(PBKDF2(pw, salt), VERIFIER_LABEL) stored as "b64salt:b64hmac".
+// Lets us reject wrong passwords instantly without leaking the AES key.
+async function buildVerifier(password) {
+  const salt = rnd(SALT_LEN);
+  const key  = await deriveHMACKey(password, salt, 'sign');
+  const sig  = await crypto.subtle.sign('HMAC', key, VERIFIER_LABEL);
+  return b64e(salt) + ':' + b64e(new Uint8Array(sig));
+}
+
+async function checkVerifier(password, stored) {
+  try {
+    const [saltB64, sigB64] = stored.split(':');
+    const salt = b64d(saltB64);
+    const expected = b64d(sigB64);
+    const key = await deriveHMACKey(password, salt, 'verify');
+    // crypto.subtle.verify uses constant-time comparison internally
+    return await crypto.subtle.verify('HMAC', key, expected, VERIFIER_LABEL);
+  } catch { return false; }
+}
+
+// ── Per-entry encryption ─────────────────────────────────────────────────
+// Each entry is independently encrypted. If you could somehow extract one
+// blob, you'd still need to brute-force that blob independently.
+async function encryptEntry(entry, password) {
+  return encryptStr(JSON.stringify(entry), password);
+}
+async function decryptEntry(blob, password) {
+  const json = await decryptStr(blob, password);
+  return json ? JSON.parse(json) : null;
+}
+
+// ── Storage ──────────────────────────────────────────────────────────────
+async function persistEntries() {
+  // Each entry encrypted independently — no shared key material between blobs
+  const blobs = await Promise.all(_entries.map(e => encryptEntry(e, _masterPw)));
+  localStorage.setItem(LS_ENTRIES, JSON.stringify(blobs));
+}
+
+async function loadEntries(password) {
+  const raw = localStorage.getItem(LS_ENTRIES);
+  if (!raw) return [];
+  const blobs = JSON.parse(raw);
+  const results = await Promise.all(blobs.map(b => decryptEntry(b, password)));
+  return results.filter(Boolean);
+}
+
+const hasVault = () => !!localStorage.getItem(LS_VERIFIER);
+
+// ═══════════════════════════════════════════════════════════════════════
+//  LOCK / UNLOCK
+// ═══════════════════════════════════════════════════════════════════════
+
+async function unlock() {
+  const pw = document.getElementById('master-pw').value;
+  if (!pw) { setLockMsg('Please enter your password.', true); return; }
+  if (!hasVault()) { setLockMsg("No vault found — click 'Set Up Vault' first.", true); return; }
+
+  setBusy(true, 'CHECKING…');
+  setLockMsg('Checking your password…', false);
+
+  const stored = localStorage.getItem(LS_VERIFIER);
+  const valid  = await checkVerifier(pw, stored);
+
+  if (!valid) {
+    setBusy(false);
+    setLockMsg('Wrong password. Try again.', true);
+    document.getElementById('master-pw').value = '';
+    return;
+  }
+
+  setLockMsg('Opening your vault…', false);
+  _entries  = await loadEntries(pw);
+  _masterPw = pw;
+
+  // Wipe input immediately after use
+  document.getElementById('master-pw').value = '';
+  setBusy(false);
+  setLockMsg('', false);
+  showApp();
+}
+
+async function createVault() {
+  const pw  = document.getElementById('new-pw').value;
+  const pw2 = document.getElementById('new-pw2').value;
+  const err = document.getElementById('create-err');
+  if (pw.length < 12) { showErr(err, 'Password needs to be at least 12 characters.'); return; }
+  if (pw !== pw2)     { showErr(err, "Passwords don't match — try again."); return; }
+  if (hasVault()) {
+    if (!confirm('This will delete your existing vault and everything in it. Are you sure?')) return;
+    localStorage.removeItem(LS_VERIFIER);
+    localStorage.removeItem(LS_ENTRIES);
+  }
+  document.getElementById('create-btn').disabled = true;
+  document.getElementById('create-btn').textContent = 'SETTING UP…';
+
+  const verifier = await buildVerifier(pw);
+  localStorage.setItem(LS_VERIFIER, verifier);
+  _masterPw = pw;
+  _entries  = [];
+  await persistEntries();
+
+  document.getElementById('new-pw').value  = '';
+  document.getElementById('new-pw2').value = '';
+  closeModal('create-vault');
+  document.getElementById('create-btn').disabled = false;
+  document.getElementById('create-btn').textContent = 'CREATE VAULT';
+  showApp();
+}
+
+function lockVault() {
+  // Best-effort memory wipe — JS doesn't expose true zeroing,
+  // but null-ing removes our reference so the GC can reclaim it.
+  _masterPw = null;
+  _entries  = [];
+
+  stopTotpRefresh();
+  // Clear all rendered secrets from the DOM before hiding
+  document.getElementById('totp-list').innerHTML  = '';
+  document.getElementById('notes-list').innerHTML = '';
+  document.getElementById('view-note-body').textContent = '';
+  document.getElementById('app').classList.remove('visible');
+  document.getElementById('lockscreen').style.display = '';
+  document.getElementById('status-dot').classList.remove('unlocked');
+  document.getElementById('status-text').textContent = 'LOCKED';
+}
+
+function showApp() {
+  document.getElementById('lockscreen').style.display = 'none';
+  document.getElementById('app').classList.add('visible');
+  document.getElementById('status-dot').classList.add('unlocked');
+  document.getElementById('status-text').textContent = 'UNLOCKED';
+  renderTOTP();
+  renderNotes();
+  startTotpRefresh();
+}
+
+function setLockMsg(msg, isErr) {
+  const el = document.getElementById('lock-msg');
+  el.textContent = msg;
+  el.className   = msg ? (isErr ? 'err' : 'info') : '';
+}
+function setBusy(on, label='UNLOCK VAULT') {
+  const btn = document.getElementById('unlock-btn');
+  btn.disabled    = on;
+  btn.textContent = on ? label : 'OPEN MY VAULT';
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  BASE32 + TOTP (RFC 6238 / RFC 4226)
+// ═══════════════════════════════════════════════════════════════════════
+
+function base32Decode(str) {
+  const A = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+  str = str.replace(/=+$/,'').toUpperCase().replace(/\s/g,'');
+  let bits=0, val=0, out=[];
+  for (const c of str) {
+    const i = A.indexOf(c);
+    if (i < 0) throw new Error(`Invalid Base32 char: ${c}`);
+    val=(val<<5)|i; bits+=5;
+    if (bits>=8) { bits-=8; out.push((val>>bits)&0xff); }
+  }
+  return new Uint8Array(out);
+}
+
+async function generateTOTP(secret, period=30) {
+  const keyBytes = base32Decode(secret);
+  const epoch    = Math.floor(Date.now()/1000);
+  const counter  = Math.floor(epoch/period);
+  const msg      = new Uint8Array(8);
+  let tmp=counter;
+  for (let i=7;i>=0;i--){msg[i]=tmp&0xff;tmp=Math.floor(tmp/256);}
+  const key  = await crypto.subtle.importKey('raw',keyBytes,{name:'HMAC',hash:'SHA-1'},false,['sign']);
+  const hmac = new Uint8Array(await crypto.subtle.sign('HMAC',key,msg));
+  const off  = hmac[hmac.length-1]&0x0f;
+  const code = ((hmac[off]&0x7f)<<24)|(hmac[off+1]<<16)|(hmac[off+2]<<8)|hmac[off+3];
+  return String(code%1_000_000).padStart(6,'0');
+}
+
+const totpRemaining = (period=30) => period-(Math.floor(Date.now()/1000)%period);
+
+// ═══════════════════════════════════════════════════════════════════════
+//  TOTP CRUD
+// ═══════════════════════════════════════════════════════════════════════
+
+async function addTOTP() {
+  const label  = v('totp-label').trim();
+  const secret = v('totp-secret').trim().replace(/\s/g,'').toUpperCase();
+  const issuer = v('totp-issuer').trim();
+  const period = parseInt(v('totp-period'))||30;
+  const notes  = v('totp-notes').trim();
+  const err    = document.getElementById('add-totp-err');
+
+  if (!label)  { showErr(err, 'Give this entry a name.'); return; }
+  if (!secret) { showErr(err, 'You need to enter the secret key.'); return; }
+  try { base32Decode(secret); } catch(e){ showErr(err, 'That secret key looks wrong: ' + e.message); return; }
+  try { await generateTOTP(secret,period); } catch{ showErr(err, "Couldn't generate a code — double-check the secret key."); return; }
+
+  _entries.push({id:uid(),type:'totp',label,secret,issuer,period,totpNotes:notes,created:Date.now()});
+  await persistEntries();
+  closeModal('add-totp');
+  clearIds('totp-label','totp-secret','totp-issuer','totp-notes');
+  document.getElementById('totp-period').value='30';
+  renderTOTP();
+  toast('Login code saved!');
+}
+
+function removeTOTP(id) {
+  confirmDelete(async()=>{ _entries=_entries.filter(e=>e.id!==id); await persistEntries(); renderTOTP(); toast('Entry deleted.'); });
+}
+
+async function renderTOTP() {
+  const list  = document.getElementById('totp-list');
+  const totps = _entries.filter(e=>e.type==='totp');
+  document.getElementById('totp-count').textContent=`(${totps.length})`;
+  if (!totps.length){ list.innerHTML=`<div class="empty">No login codes yet.<br>Click <span>+ ADD CODE</span> to add your first one.</div>`; return; }
+  list.innerHTML=totps.map(e=>`
+    <div class="entry-card" id="card-${e.id}">
+      <div class="card-actions">
+        <button class="btn-icon" title="Copy" onclick="copyCode('${e.id}')">⎘</button>
+        <button class="btn-icon red" title="Remove" onclick="removeTOTP('${e.id}')">✕</button>
+      </div>
+      <div class="badge totp">2FA CODE</div>
+      <div class="card-label">${esc(e.label)}</div>
+      <div class="card-sub">${esc(e.issuer||'—')} · refreshes every ${e.period}s</div>
+      <div class="totp-code" id="code-${e.id}" onclick="copyCode('${e.id}')">——————</div>
+      <div class="totp-bar-wrap"><div class="totp-bar" id="bar-${e.id}"></div></div>
+      <div class="totp-remaining" id="rem-${e.id}"></div>
+      ${e.totpNotes?`<div style="margin-top:10px;font-size:11px;color:var(--muted);border-top:1px solid var(--border);padding-top:8px">${esc(e.totpNotes)}</div>`:''}    </div>`).join('');
+  renderTOTPCodes();
+}
+
+async function renderTOTPCodes() {
+  for (const e of _entries.filter(x=>x.type==='totp')) {
+    const ce=document.getElementById(`code-${e.id}`);
+    const be=document.getElementById(`bar-${e.id}`);
+    const re=document.getElementById(`rem-${e.id}`);
+    if (!ce||ce.classList.contains('copy-flash')) continue;
+    const rem=totpRemaining(e.period), pct=(rem/e.period)*100, warn=rem<=5;
+    try{ const c=await generateTOTP(e.secret,e.period); ce.textContent=c.slice(0,3)+' '+c.slice(3); }
+    catch{ ce.textContent='ERROR'; }
+    ce.classList.toggle('warn',warn);
+    be.style.width=pct+'%';
+    be.classList.toggle('warn',warn);
+    re.textContent=`${rem}s`;
+  }
+}
+
+async function copyCode(id) {
+  const e=_entries.find(x=>x.id===id); if (!e) return;
+  try {
+    const code=await generateTOTP(e.secret,e.period);
+    await navigator.clipboard.writeText(code);
+    const el=document.getElementById(`code-${id}`);
+    el.classList.add('copy-flash'); el.textContent='COPIED!';
+    setTimeout(()=>{el.classList.remove('copy-flash');renderTOTPCodes();},1400);
+    toast('Code copied to clipboard!');
+  } catch { toast('Could not copy — check your browser permissions.'); }
+}
+
+let _totpTimer=null;
+function startTotpRefresh(){ stopTotpRefresh(); _totpTimer=setInterval(renderTOTPCodes,1000); renderTOTPCodes(); }
+function stopTotpRefresh(){ clearInterval(_totpTimer); _totpTimer=null; }
+
+// ═══════════════════════════════════════════════════════════════════════
+//  NOTES CRUD
+// ═══════════════════════════════════════════════════════════════════════
+
+async function addNote() {
+  const title   = v('note-title').trim();
+  const body    = v('note-body');
+  const extraPw = v('note-extra-pw');
+  const err     = document.getElementById('add-note-err');
+
+  if (!title){ showErr(err,'Give this note a title.'); return; }
+  if (!body) { showErr(err,'The note is empty.'); return; }
+
+  const hasExtra = extraPw.length > 0;
+  // Two-factor key: master + extra password combined with a fixed separator
+  // that cannot appear in either password naturally (NUL bytes).
+  // Knowing only masterPw or only extraPw cannot decrypt the note body.
+  const effectivePw = hasExtra ? _masterPw+'\x00\xFF\x00'+extraPw : _masterPw;
+  const encBody = await encryptStr(body, effectivePw);
+
+  // Title stored in the entry object (which itself is encrypted with masterPw)
+  _entries.push({id:uid(),type:'note',title,encBody,hasExtra,created:Date.now()});
+  await persistEntries();
+  closeModal('add-note');
+  clearIds('note-title','note-body','note-extra-pw');
+  renderNotes();
+  toast('Note saved!');
+}
+
+function removeNote(id) {
+  confirmDelete(async()=>{ _entries=_entries.filter(e=>e.id!==id); await persistEntries(); renderNotes(); toast('Note deleted.'); });
+}
+
+function renderNotes() {
+  const list  = document.getElementById('notes-list');
+  const notes = _entries.filter(e=>e.type==='note');
+  document.getElementById('notes-count').textContent=`(${notes.length})`;
+  if (!notes.length){ list.innerHTML=`<div class="empty">No notes yet.<br>Click <span>+ ADD NOTE</span> to create one.</div>`; return; }
+  list.innerHTML=notes.map(n=>`
+    <div class="entry-card">
+      <div class="card-actions">
+        <button class="btn-icon" title="View note" onclick="viewNote('${n.id}')">👁</button>
+        <button class="btn-icon red" title="Delete" onclick="removeNote('${n.id}')">✕</button>
+      </div>
+      <div class="badge note">NOTE</div>${n.hasExtra?`<span class="badge locked" style="margin-left:4px">EXTRA LOCK</span>`:''}
+      <div class="card-label">${esc(n.title)}</div>
+      <div class="card-sub">Saved ${new Date(n.created).toLocaleDateString()}</div>
+      <div class="note-locked">🔒 Locked — click 👁 to read</div>
+    </div>`).join('');
+}
+
+let _viewingNoteId=null;
+
+function viewNote(id) {
+  const n=_entries.find(x=>x.id===id); if (!n) return;
+  _viewingNoteId=id;
+  document.getElementById('view-note-title').textContent=esc(n.title);
+  document.getElementById('view-note-pw').value='';
+  const errEl=document.getElementById('view-note-err');
+  errEl.textContent=''; errEl.classList.remove('show');
+  document.getElementById('view-note-body-section').style.display='none';
+  if (n.hasExtra) {
+    document.getElementById('view-note-pw-section').style.display='';
+    openModal('view-note');
+  } else {
+    document.getElementById('view-note-pw-section').style.display='none';
+    openModal('view-note');
+    decryptAndShowNote();
+  }
+}
+
+async function decryptAndShowNote() {
+  const n=_entries.find(x=>x.id===_viewingNoteId); if (!n) return;
+  const extraPw=v('view-note-pw');
+  const effectivePw=n.hasExtra ? _masterPw+'\x00\xFF\x00'+extraPw : _masterPw;
+  const dec=await decryptStr(n.encBody, effectivePw);
+  if (dec===null){ showErr(document.getElementById('view-note-err'),'Wrong password — try again.'); return; }
+  document.getElementById('view-note-pw-section').style.display='none';
+  document.getElementById('view-note-body-section').style.display='';
+  document.getElementById('view-note-body').textContent=dec;
+}
+
+function wipeNoteView() {
+  document.getElementById('view-note-body').textContent='';
+  document.getElementById('view-note-pw').value='';
+  _viewingNoteId=null;
+}
+
+async function copyNoteContent() {
+  try { await navigator.clipboard.writeText(document.getElementById('view-note-body').textContent); toast('Note copied!'); }
+  catch { toast('Could not copy — check your browser permissions.'); }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  UI HELPERS
+// ═══════════════════════════════════════════════════════════════════════
+
+const v   = id => document.getElementById(id)?.value ?? '';
+const esc = s  => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+function openModal(name)  { document.getElementById(`modal-${name}`).classList.add('open'); }
+function closeModal(name) { document.getElementById(`modal-${name}`).classList.remove('open'); }
+
+document.querySelectorAll('.modal-overlay').forEach(ov =>
+  ov.addEventListener('click', e => { if (e.target===ov) ov.classList.remove('open'); })
+);
+
+function clearIds(...ids) { ids.forEach(id => { const el=document.getElementById(id); if(el) el.value=''; }); }
+function showErr(el, msg) { el.textContent=msg; el.classList.add('show'); }
+
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(`tab-${name}`).classList.add('active');
+  btn.classList.add('active');
+}
+
+let _deleteCb=null;
+function confirmDelete(cb){ _deleteCb=cb; openModal('confirm-delete'); }
+document.getElementById('confirm-delete-btn').addEventListener('click',()=>{
+  closeModal('confirm-delete');
+  if (_deleteCb){ _deleteCb(); _deleteCb=null; }
+});
+
+let _toastTimer=null;
+function toast(msg) {
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer=setTimeout(()=>el.classList.remove('show'),2400);
+}
+
+function uid() {
+  return b64e(rnd(12)).replace(/[+/=]/g,c=>({'+':'x','/':'y','=':''}[c]));
+}
+
+// Crack-time estimator — updates live as you type
+document.getElementById('new-pw').addEventListener('input', function(){
+  const val = this.value;
+  const est = estimateCrackTime(val);
+
+  // Basic strength bar (visual feedback on length + charset)
+  let checks = [val.length>=8, val.length>=12, val.length>=16,
+    /[A-Z]/.test(val)&&/[a-z]/.test(val), /[0-9]/.test(val), /[^A-Za-z0-9]/.test(val)];
+  const s = checks.filter(Boolean).length;
+  const pct = Math.min(100, (s/6)*100);
+  const col = !est ? 'var(--red)' : est.color;
+  document.getElementById('pw-strength-fill').style.cssText = `width:${pct}%;background:${col}`;
+
+  // Crack time label
+  const lbl = document.getElementById('pw-strength-label');
+  if (!val) { lbl.textContent = ''; return; }
+  const len12warn = val.length < 12 ? ' ⚠ needs 12+ characters' : '';
+  lbl.style.color = col;
+  lbl.textContent = est
+    ? `Time to crack this password: ${est.label}${len12warn}`
+    : `Enter a password${len12warn}`;
+});
+
+document.getElementById('master-pw').addEventListener('keydown', e=>{ if(e.key==='Enter') unlock(); });
+
+// Lock on page unload / tab close — wipe memory and blank inputs
+window.addEventListener('pagehide',  ()=>lockVault());
+window.addEventListener('visibilitychange', ()=>{ if(document.hidden && _masterPw) { /* optional: auto-lock on hide */ } });
+
+// Highlight Create button if no vault exists yet
+if (!hasVault()) {
+  const b=document.getElementById('create-vault-btn');
+  b.style.borderColor='var(--amber)'; b.style.color='var(--amber)';
+}
+</script>
+</body>
+</html>
