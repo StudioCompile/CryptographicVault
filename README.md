@@ -1,0 +1,1 @@
+Securely store TOTP codes and text locally using strong cryptographic encryption. No plain text is ever saved, and with a strong password, the information is pretty much impossible to access without authorization. (Website Vibecoded)
