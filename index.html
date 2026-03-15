@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VAULT</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext x='50%25' y='54%25' dominant-baseline='central' text-anchor='middle' font-family='Arial Black%2C sans-serif' font-weight='900' font-size='30' fill='%23f5a623'%3EV%3C/text%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -143,9 +144,11 @@
   <h2>Enter Your Password</h2>
   <p>Everything in here — your 2FA codes and private notes — is fully encrypted and stored only on your device. Your password is never saved anywhere, so even if someone stole your data, they couldn't read a single thing without it. With a strong password, it would take longer than the age of the universe to crack.</p>
   <div class="lock-form">
-    <input type="password" id="master-pw" placeholder="Master password…"
-      autocomplete="new-password" autocorrect="off" autocapitalize="off"
-      spellcheck="false" readonly onfocus="this.removeAttribute('readonly')">
+    <input type="password" id="master-pw" placeholder="Enter your password…"
+      autocomplete="off" autocorrect="off" autocapitalize="off"
+      spellcheck="false" data-lpignore="true" data-form-type="other"
+      readonly onfocus="this.removeAttribute('readonly')"
+      onkeydown="if(event.key==='Enter')unlock()">
     <div id="lock-msg"></div>
     <button class="btn btn-primary" id="unlock-btn" onclick="unlock()">OPEN MY VAULT</button>
     <button class="btn btn-ghost" id="create-vault-btn" onclick="openModal('create-vault')">CREATE VAULT</button>
@@ -190,14 +193,16 @@
     <div class="form-row">
       <label>Your Password</label>
       <input type="password" id="new-pw" placeholder="At least 12 characters…"
-        autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly')">
+        autocomplete="off" data-lpignore="true" data-form-type="other"
+        readonly onfocus="this.removeAttribute('readonly')">
       <div class="strength-bar"><div class="strength-fill" id="pw-strength-fill"></div></div>
       <div style="font-size:10px;color:var(--muted);margin-top:4px" id="pw-strength-label"></div>
     </div>
     <div class="form-row">
       <label>Type It Again to Confirm</label>
       <input type="password" id="new-pw2" placeholder="Repeat password…"
-        autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly')">
+        autocomplete="off" data-lpignore="true" data-form-type="other"
+        readonly onfocus="this.removeAttribute('readonly')">
     </div>
     <div class="form-err" id="create-err"></div>
     <div class="modal-footer">
@@ -256,7 +261,8 @@
     <div class="form-row">
       <label>Extra Password (optional) — adds a second lock to this note only</label>
       <input type="password" id="note-extra-pw" placeholder="Leave blank to just use your main password"
-        autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly')">
+        autocomplete="off" data-lpignore="true" data-form-type="other"
+        readonly onfocus="this.removeAttribute('readonly')">
     </div>
     <div class="form-err" id="add-note-err"></div>
     <div class="modal-footer">
@@ -276,7 +282,8 @@
       <div class="form-row">
         <label>Second Password</label>
         <input type="password" id="view-note-pw" placeholder="Enter the extra password…"
-          autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly')">
+          autocomplete="off" data-lpignore="true" data-form-type="other"
+          readonly onfocus="this.removeAttribute('readonly')">
       </div>
       <div class="form-err" id="view-note-err"></div>
       <div class="modal-footer" style="margin-top:12px">
@@ -912,7 +919,6 @@ document.getElementById('new-pw').addEventListener('input', function(){
     : `Enter a password${len12warn}`;
 });
 
-document.getElementById('master-pw').addEventListener('keydown', e=>{ if(e.key==='Enter') unlock(); });
 
 // Lock on page unload / tab close — wipe memory and blank inputs
 window.addEventListener('pagehide',  ()=>lockVault());
