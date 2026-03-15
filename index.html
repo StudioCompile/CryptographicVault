@@ -410,42 +410,113 @@
       <input type="text" id="settings-name" placeholder="e.g. Personal, Work…" autocomplete="off">
     </div>
 
-    <!-- Change password -->
+    <!-- Change credential — contents swapped by JS based on method -->
     <div style="border-top:1px solid var(--border);padding-top:14px;margin-bottom:14px">
-      <p style="font-size:11px;color:var(--muted);margin-bottom:12px;letter-spacing:.5px">CHANGE PASSWORD</p>
-      <div class="form-row">
-        <label>Current Password</label>
-        <input type="password" id="chpw-current" placeholder="Your current password…"
-          autocomplete="off" data-lpignore="true" data-form-type="other"
-          readonly onfocus="this.removeAttribute('readonly')">
+      <p style="font-size:11px;color:var(--muted);margin-bottom:12px;letter-spacing:.5px" id="chpw-section-title">CHANGE PASSWORD</p>
+
+      <!-- Password mode -->
+      <div id="chpw-pw-mode">
+        <div class="form-row">
+          <label>Current Password</label>
+          <input type="password" id="chpw-current" placeholder="Your current password…"
+            autocomplete="off" data-lpignore="true" data-form-type="other"
+            readonly onfocus="this.removeAttribute('readonly')">
+        </div>
+        <div class="form-row">
+          <label>New Password</label>
+          <input type="password" id="chpw-new" placeholder="At least 12 characters…"
+            autocomplete="off" data-lpignore="true" data-form-type="other"
+            readonly onfocus="this.removeAttribute('readonly')">
+          <div class="strength-bar"><div class="strength-fill" id="chpw-strength-fill"></div></div>
+          <div style="font-size:10px;color:var(--muted);margin-top:4px" id="chpw-strength-label"></div>
+        </div>
+        <div class="form-row">
+          <label>Confirm New Password</label>
+          <input type="password" id="chpw-confirm" placeholder="Type new password again…"
+            autocomplete="off" data-lpignore="true" data-form-type="other"
+            readonly onfocus="this.removeAttribute('readonly')">
+        </div>
+        <div class="form-err" id="chpw-err"></div>
+        <button class="btn btn-ghost btn-full" onclick="changePassword()" style="margin-top:4px">CHANGE PASSWORD</button>
       </div>
-      <div class="form-row">
-        <label>New Password</label>
-        <input type="password" id="chpw-new" placeholder="At least 12 characters…"
-          autocomplete="off" data-lpignore="true" data-form-type="other"
-          readonly onfocus="this.removeAttribute('readonly')">
-        <div class="strength-bar"><div class="strength-fill" id="chpw-strength-fill"></div></div>
-        <div style="font-size:10px;color:var(--muted);margin-top:4px" id="chpw-strength-label"></div>
+
+      <!-- Passkey-only mode -->
+      <div id="chpw-pk-mode" style="display:none">
+        <p style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.7">
+          This vault uses a passkey. Verify it first, then choose what to do.
+        </p>
+        <div id="chpw-pk-verified-section" style="display:none">
+          <div class="form-row">
+            <label>New Password</label>
+            <input type="password" id="chpw-pk-new" placeholder="At least 12 characters…"
+              autocomplete="off" data-lpignore="true" data-form-type="other"
+              readonly onfocus="this.removeAttribute('readonly')">
+            <div class="strength-bar"><div class="strength-fill" id="chpw-pk-strength-fill"></div></div>
+            <div style="font-size:10px;color:var(--muted);margin-top:4px" id="chpw-pk-strength-label"></div>
+          </div>
+          <div class="form-row">
+            <label>Confirm New Password</label>
+            <input type="password" id="chpw-pk-confirm" placeholder="Type new password again…"
+              autocomplete="off" data-lpignore="true" data-form-type="other"
+              readonly onfocus="this.removeAttribute('readonly')">
+          </div>
+          <p style="font-size:11px;color:var(--muted);margin-bottom:8px">What would you like to do?</p>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <button class="btn btn-ghost btn-full" onclick="addPasswordToPasskeyVault()">ADD PASSWORD &amp; KEEP PASSKEY</button>
+            <button class="btn btn-ghost btn-full" onclick="switchToPasswordOnly()">SWITCH TO PASSWORD ONLY (removes passkey)</button>
+          </div>
+        </div>
+        <div class="form-err" id="chpw-pk-err"></div>
+        <button class="btn btn-ghost btn-full" id="chpw-pk-verify-btn" onclick="verifyPasskeyForChange()" style="margin-top:4px">🪪 VERIFY WITH PASSKEY FIRST</button>
       </div>
-      <div class="form-row">
-        <label>Confirm New Password</label>
-        <input type="password" id="chpw-confirm" placeholder="Type the new password again…"
-          autocomplete="off" data-lpignore="true" data-form-type="other"
-          readonly onfocus="this.removeAttribute('readonly')">
-      </div>
-      <div class="form-err" id="chpw-err"></div>
-      <button class="btn btn-ghost btn-full" onclick="changePassword()" style="margin-top:4px">CHANGE PASSWORD</button>
     </div>
 
     <!-- Danger zone -->
     <div style="border-top:1px solid var(--border);padding-top:14px">
       <p style="font-size:11px;color:var(--muted);margin-bottom:10px;letter-spacing:.5px">DANGER ZONE</p>
-      <button class="btn btn-danger btn-full" onclick="deleteCurrentVault()">🗑 DELETE THIS VAULT</button>
+      <button class="btn btn-danger btn-full" onclick="confirmDeleteCurrentVault()">🗑 DELETE THIS VAULT</button>
     </div>
 
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('vault-settings')">CLOSE</button>
       <button class="btn btn-primary" onclick="saveVaultSettings()">SAVE NAME</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm delete vault -->
+<div class="modal-overlay" id="modal-confirm-delete-vault">
+  <div class="modal">
+    <h3>Delete Vault?</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:8px;line-height:1.7" id="confirm-delete-vault-msg"></p>
+    <p style="font-size:12px;color:var(--red);margin-bottom:20px">This is permanent and cannot be undone.</p>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('confirm-delete-vault')">CANCEL</button>
+      <button class="btn btn-danger" id="confirm-delete-vault-btn">DELETE</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm reset all -->
+<div class="modal-overlay" id="modal-confirm-reset-all">
+  <div class="modal">
+    <h3>Delete Everything?</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:8px;line-height:1.7">This will permanently delete all your vaults and all data stored on this device.</p>
+    <p style="font-size:12px;color:var(--red);margin-bottom:20px">There is no way to undo this.</p>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('confirm-reset-all')">CANCEL</button>
+      <button class="btn btn-danger" onclick="doResetAll()">DELETE EVERYTHING</button>
+    </div>
+  </div>
+</div>
+
+<!-- Session expired -->
+<div class="modal-overlay" id="modal-session-expired">
+  <div class="modal">
+    <h3>Vault Locked</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.7" id="session-expired-msg">Your vault was locked automatically.</p>
+    <div class="modal-footer">
+      <button class="btn btn-primary btn-full" onclick="closeModal('session-expired')">OK</button>
     </div>
   </div>
 </div>
@@ -736,10 +807,8 @@ function configureUnlockUI(id) {
 
   if (method === 'passkey') {
     pkBtn.textContent = '🪪 UNLOCK WITH PASSKEY';
-    setTimeout(() => { if (_selectedVaultId === id) unlockWithPasskey(); }, 300);
   } else if (method === 'both') {
     pkBtn.textContent = '🪪 USE PASSKEY INSTEAD';
-    setTimeout(() => { if (_selectedVaultId === id) unlockWithPasskey(); }, 300);
   }
 }
 
@@ -769,6 +838,7 @@ async function unlock() {
   document.getElementById('master-pw').value = '';
   setBusy(false);
   setLockMsg('', false);
+  resetIdleTimer();
   showApp();
 }
 
@@ -784,20 +854,33 @@ function setBusy(on, lbl='OPEN MY VAULT') {
 }
 
 // ── Delete individual vault ───────────────────────────────────────────────
+let _pendingDeleteVaultId = null;
+
 function deleteVault(id) {
   const idx  = getIndex();
   const info = idx.find(v => v.id === id);
   if (!info) return;
-  if (!confirm(`Delete vault "${info.name}"? This is permanent and cannot be undone.`)) return;
-  deleteVaultData(id);
-  if (_selectedVaultId === id) _selectedVaultId = null;
-  renderLockScreen();
-  toast('Vault deleted.');
+  _pendingDeleteVaultId = id;
+  document.getElementById('confirm-delete-vault-msg').textContent =
+    `"${info.name}" and all its codes and notes will be permanently deleted.`;
+  document.getElementById('confirm-delete-vault-btn').onclick = () => {
+    closeModal('confirm-delete-vault');
+    deleteVaultData(_pendingDeleteVaultId);
+    if (_selectedVaultId === _pendingDeleteVaultId) _selectedVaultId = null;
+    _pendingDeleteVaultId = null;
+    renderLockScreen();
+    toast('Vault deleted.');
+  };
+  openModal('confirm-delete-vault');
 }
 
 // ── Reset all ─────────────────────────────────────────────────────────────
 function confirmResetAll() {
-  if (!confirm('Delete ALL vaults and ALL data? This cannot be undone.')) return;
+  openModal('confirm-reset-all');
+}
+
+function doResetAll() {
+  closeModal('confirm-reset-all');
   const idx = getIndex();
   idx.forEach(v => deleteVaultData(v.id));
   localStorage.removeItem(IDX_KEY);
@@ -947,9 +1030,10 @@ function showApp() {
   document.getElementById('status-text').textContent='UNLOCKED';
   const info = getIndex().find(v=>v.id===_activeId);
   document.getElementById('active-vault-name').textContent = info ? info.name : '';
-  const method = localStorage.getItem(vKey(_activeId,'method'))||'password';
-  document.getElementById('share-btn').style.display = method==='passkey' ? 'none' : '';
+  // Always show share btn — passkey-only vaults show an explanation instead
+  document.getElementById('share-btn').style.display = '';
   renderTOTP(); renderNotes(); startTotpRefresh();
+  resetIdleTimer();
 }
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -1020,7 +1104,7 @@ async function unlockWithPasskey() {
     const verifier = localStorage.getItem(vKey(_selectedVaultId,'verifier'));
     if (!await checkVerifier(secret, verifier)) { setBusy(false); setLockMsg('Passkey mismatch.',true); return; }
     _entries=await loadEntries(_selectedVaultId,secret); _masterPw=secret; _activeId=_selectedVaultId;
-    setBusy(false); setLockMsg('',false); showApp();
+    setBusy(false); setLockMsg('',false); resetIdleTimer(); showApp();
   } catch(e) { setBusy(false); setLockMsg('Passkey cancelled or failed: ' + (e.message||''), true); }
 }
 
@@ -1029,6 +1113,15 @@ async function unlockWithPasskey() {
 // ═══════════════════════════════════════════════════════════════════════
 
 function openShareModal() {
+  const method = localStorage.getItem(vKey(_activeId,'method')) || 'password';
+  if (method === 'passkey') {
+    // Can't share — no password to encrypt with. Show explanation modal.
+    document.getElementById('share-url').textContent = '';
+    document.getElementById('share-url').innerHTML =
+      '<span style="color:var(--muted);font-size:12px;line-height:1.7">Share links are not available for passkey-only vaults because there is no password to protect the link with.<br><br>Go to <strong style="color:var(--text)">⚙ Settings → Change Credential</strong> to add a password, then share links will work.</span>';
+    openModal('share-link');
+    return;
+  }
   const verifier = localStorage.getItem(vKey(_activeId,'verifier'))||'';
   const entries  = localStorage.getItem(vKey(_activeId,'entries'))||'[]';
   const info     = getIndex().find(v=>v.id===_activeId);
@@ -1240,6 +1333,18 @@ document.getElementById('chpw-new').addEventListener('input',function(){
   lbl.textContent=est?(val.length<12?`Time to crack: ${est.label} ⚠ needs 12+ chars`:`Time to crack: ${est.label}`):'Enter a password';
 });
 
+// Strength meter for passkey-mode new password
+document.getElementById('chpw-pk-new').addEventListener('input',function(){
+  const val=this.value,est=estimateCrackTime(val);
+  let checks=[val.length>=8,val.length>=12,val.length>=16,/[A-Z]/.test(val)&&/[a-z]/.test(val),/[0-9]/.test(val),/[^a-zA-Z0-9]/.test(val)];
+  const s=checks.filter(Boolean).length,pct=Math.min(100,(s/6)*100),col=!est?'var(--red)':est.color;
+  document.getElementById('chpw-pk-strength-fill').style.cssText=`width:${pct}%;background:${col}`;
+  const lbl=document.getElementById('chpw-pk-strength-label');
+  if(!val){lbl.textContent='';return;}
+  lbl.style.color=col;
+  lbl.textContent=est?(val.length<12?`Time to crack: ${est.label} ⚠ needs 12+ chars`:`Time to crack: ${est.label}`):'Enter a password';
+});
+
 // ═══════════════════════════════════════════════════════════════════════
 //  UI HELPERS
 // ═══════════════════════════════════════════════════════════════════════
@@ -1272,11 +1377,77 @@ function toast(msg){
   clearTimeout(_toastTimer);_toastTimer=setTimeout(()=>el.classList.remove('show'),2400);
 }
 
-// Lock when tab is hidden or page is unloaded — prevents shoulder surfing
-window.addEventListener('pagehide', () => lockVault());
-document.addEventListener('visibilitychange', () => {
-  if (document.hidden && _masterPw) lockVault();
+// ── Auto-lock timers ──────────────────────────────────────────────────────
+// Locks after 5 min of no interaction, or 2 min of tab being hidden
+let _idleTimer = null, _hiddenTimer = null;
+
+function resetIdleTimer() {
+  if (!_masterPw) return;
+  clearTimeout(_idleTimer);
+  _idleTimer = setTimeout(() => {
+    expireLock('You were inactive for 5 minutes.');
+  }, 5 * 60 * 1000);
+}
+
+function expireLock(reason) {
+  lockVault();
+  // Close all open modals first, then show expired popup
+  document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
+  document.getElementById('session-expired-msg').textContent = reason;
+  openModal('session-expired');
+}
+
+// Reset idle timer on any user interaction
+['mousemove','keydown','mousedown','touchstart','scroll'].forEach(evt => {
+  document.addEventListener(evt, resetIdleTimer, { passive: true });
 });
+
+// Hidden timer: lock after 2 min of tab being hidden
+document.addEventListener('visibilitychange', () => {
+  if (!_masterPw) return;
+  if (document.hidden) {
+    _hiddenTimer = setTimeout(() => {
+      expireLock('The tab was in the background for 2 minutes.');
+    }, 2 * 60 * 1000);
+  } else {
+    clearTimeout(_hiddenTimer);
+  }
+});
+
+window.addEventListener('pagehide', () => { if (_masterPw) lockVault(); });
+
+async function changePassword() {
+  const currentPw = document.getElementById('chpw-current').value;
+  const newPw     = document.getElementById('chpw-new').value;
+  const confirmPw = document.getElementById('chpw-confirm').value;
+  const err       = document.getElementById('chpw-err');
+  err.textContent=''; err.classList.remove('show');
+
+  if (!currentPw) { showErr(err,'Enter your current password.'); return; }
+  if (newPw.length < 12) { showErr(err,'New password needs at least 12 characters.'); return; }
+  if (newPw !== confirmPw) { showErr(err,"New passwords don't match — type them again."); return; }
+  if (newPw === currentPw) { showErr(err,'New password is the same as the current one.'); return; }
+
+  const verifier = localStorage.getItem(vKey(_activeId,'verifier'));
+  const valid    = await checkVerifier(currentPw, verifier);
+  if (!valid) { showErr(err,'Current password is wrong.'); clearIds('chpw-current'); return; }
+
+  const reencrypted = await Promise.all(_entries.map(e => encryptStr(JSON.stringify(e), newPw)));
+  localStorage.setItem(vKey(_activeId,'entries'), JSON.stringify(reencrypted));
+  for (const e of _entries) {
+    if (e.type==='note' && e.encBody && !e.hasExtra) {
+      const plain = await decryptStr(e.encBody, currentPw);
+      if (plain) e.encBody = await encryptStr(plain, newPw);
+    }
+  }
+  localStorage.setItem(vKey(_activeId,'verifier'), await buildVerifier(newPw));
+  _masterPw = newPw;
+  await persistEntries();
+  clearIds('chpw-current','chpw-new','chpw-confirm');
+  document.getElementById('chpw-strength-fill').style.cssText='width:0%';
+  document.getElementById('chpw-strength-label').textContent='';
+  toast('Password changed successfully.');
+}
 
 // ═══════════════════════════════════════════════════════════════════════
 //  IMPORT FROM SHARE LINK
@@ -1315,15 +1486,30 @@ function confirmImport() {
 // ═══════════════════════════════════════════════════════════════════════
 
 function openVaultSettings() {
-  const idx  = getIndex();
-  const info = idx.find(v => v.id === _activeId);
+  const idx    = getIndex();
+  const info   = idx.find(v => v.id === _activeId);
+  const method = localStorage.getItem(vKey(_activeId,'method')) || 'password';
   document.getElementById('settings-name').value = info ? info.name : '';
-  // Clear change password fields
-  clearIds('chpw-current','chpw-new','chpw-confirm');
-  const errEl = document.getElementById('chpw-err');
-  errEl.textContent=''; errEl.classList.remove('show');
-  document.getElementById('chpw-strength-fill').style.cssText='width:0%;background:var(--red)';
-  document.getElementById('chpw-strength-label').textContent='';
+
+  // Show correct credential-change UI based on method
+  const isPasskeyOnly = method === 'passkey';
+  document.getElementById('chpw-pw-mode').style.display      = isPasskeyOnly ? 'none' : '';
+  document.getElementById('chpw-pk-mode').style.display      = isPasskeyOnly ? '' : 'none';
+  document.getElementById('chpw-section-title').textContent  = isPasskeyOnly ? 'CHANGE CREDENTIAL' : 'CHANGE PASSWORD';
+
+  // Reset all fields and states
+  clearIds('chpw-current','chpw-new','chpw-confirm','chpw-pk-new','chpw-pk-confirm');
+  ['chpw-err','chpw-pk-err'].forEach(id => {
+    const el = document.getElementById(id);
+    el.textContent=''; el.classList.remove('show');
+  });
+  ['chpw-strength-fill','chpw-pk-strength-fill'].forEach(id =>
+    document.getElementById(id).style.cssText='width:0%;background:var(--red)');
+  ['chpw-strength-label','chpw-pk-strength-label'].forEach(id =>
+    document.getElementById(id).textContent='');
+  document.getElementById('chpw-pk-verified-section').style.display='none';
+  document.getElementById('chpw-pk-verify-btn').style.display='';
+  document.getElementById('chpw-pk-verify-btn').textContent='🪪 VERIFY WITH PASSKEY FIRST';
   openModal('vault-settings');
 }
 
@@ -1337,86 +1523,89 @@ function saveVaultSettings() {
   toast('Name saved.');
 }
 
-async function changePassword() {
-  const currentPw = document.getElementById('chpw-current').value;
-  const newPw     = document.getElementById('chpw-new').value;
-  const confirmPw = document.getElementById('chpw-confirm').value;
-  const err       = document.getElementById('chpw-err');
-  err.textContent=''; err.classList.remove('show');
+// ── Passkey-only credential change ────────────────────────────────────────
 
-  if (!currentPw) { showErr(err,'Enter your current password.'); return; }
-  if (newPw.length < 12) { showErr(err,'New password needs at least 12 characters.'); return; }
-  if (newPw !== confirmPw) { showErr(err,"New passwords don't match — type them again."); return; }
-  if (newPw === currentPw) { showErr(err,'New password is the same as the current one.'); return; }
+let _pkChangeSecret = null; // the unwrapped vault secret after passkey verify
 
-  const btn = document.querySelector('#modal-vault-settings .btn-ghost[onclick="changePassword()"], #modal-vault-settings button[onclick="changePassword()"]');
-  const changePwBtn = document.getElementById('modal-vault-settings')?.querySelector('button[onclick="changePassword()"]');
+async function verifyPasskeyForChange() {
+  const pkData = JSON.parse(localStorage.getItem(vKey(_activeId,'pkcred'))||'null');
+  if (!pkData) { showErr(document.getElementById('chpw-pk-err'),'No passkey data found.'); return; }
+  const btn = document.getElementById('chpw-pk-verify-btn');
+  btn.textContent = '🪪 Waiting for passkey…'; btn.disabled = true;
+  try {
+    const assertion = await navigator.credentials.get({ publicKey: {
+      challenge: rnd(32), rpId: rpId(),
+      allowCredentials: [{ type:'public-key', id:b64d(pkData.credId) }],
+      userVerification: 'required', timeout: 60000
+    }});
+    const secret = await unwrapSecretWithCred(pkData.wrappedSecret, b64e(assertion.rawId));
+    if (!secret) { showErr(document.getElementById('chpw-pk-err'),'Could not verify passkey.'); btn.textContent='🪪 VERIFY WITH PASSKEY FIRST'; btn.disabled=false; return; }
+    _pkChangeSecret = secret;
+    btn.style.display = 'none';
+    document.getElementById('chpw-pk-verified-section').style.display = '';
+    document.getElementById('chpw-pk-err').textContent='✓ Passkey verified — now set a password below.';
+    document.getElementById('chpw-pk-err').style.color='var(--green)';
+    document.getElementById('chpw-pk-err').classList.add('show');
+  } catch { showErr(document.getElementById('chpw-pk-err'),'Passkey cancelled.'); btn.textContent='🪪 VERIFY WITH PASSKEY FIRST'; btn.disabled=false; }
+}
 
-  // Verify current password
-  const verifier = localStorage.getItem(vKey(_activeId,'verifier'));
-  const valid    = await checkVerifier(currentPw, verifier);
-  if (!valid) { showErr(err,'Current password is wrong. Try again.'); clearIds('chpw-current'); return; }
+async function _applyNewPasswordFromPasskeyChange(keepPasskey) {
+  const newPw  = document.getElementById('chpw-pk-new').value;
+  const conf   = document.getElementById('chpw-pk-confirm').value;
+  const err    = document.getElementById('chpw-pk-err');
+  err.style.color='var(--red)';
+  if (newPw.length < 12) { showErr(err,'Password needs at least 12 characters.'); return; }
+  if (newPw !== conf)    { showErr(err,"Passwords don't match."); return; }
+  if (!_pkChangeSecret)  { showErr(err,'Verify your passkey first.'); return; }
 
   // Re-encrypt all entries with new password
   const reencrypted = await Promise.all(_entries.map(e => encryptStr(JSON.stringify(e), newPw)));
   localStorage.setItem(vKey(_activeId,'entries'), JSON.stringify(reencrypted));
-
-  // Re-encrypt any note bodies that have extra passwords — these use masterPw as part of key,
-  // so we need to re-encrypt them with the new master password combined with extra pw.
-  // Since we don't store extra passwords, we can only re-wrap the outer entries layer.
-  // Notes with extra passwords will still be decryptable — their inner layer uses
-  // masterPw+extraPw so they need special handling: re-encrypt outer, inner stays intact
-  // but uses old master pw prefix — we need to re-derive those too.
-  // Simplest correct approach: re-encrypt each note's encBody from old key to new key.
-  const reencryptedNotes = [];
+  // Re-encrypt notes without extra passwords
   for (const e of _entries) {
-    if (e.type === 'note' && e.encBody) {
-      // Decrypt with old password, re-encrypt with new
-      const oldPw = e.hasExtra ? currentPw + '\x00\xFF\x00' + '___UNKNOWN_EXTRA___' : currentPw;
-      // For notes without extra password, we can re-encrypt properly
-      if (!e.hasExtra) {
-        const plain = await decryptStr(e.encBody, currentPw);
-        if (plain !== null) {
-          e.encBody = await encryptStr(plain, newPw);
-        }
-      }
-      // Notes with extra password: the inner encryption uses masterPw+extraPw.
-      // We can't re-encrypt without knowing the extra password.
-      // The outer entry blob is already re-encrypted above. The inner encBody
-      // will still decrypt correctly IF the user knows their extra password and
-      // we update the prefix. For now, mark these as needing manual re-entry.
-      // This is a known limitation — we note it but don't break anything.
+    if (e.type==='note' && e.encBody && !e.hasExtra) {
+      const plain = await decryptStr(e.encBody, _pkChangeSecret);
+      if (plain) e.encBody = await encryptStr(plain, newPw);
     }
   }
-
-  // Build new verifier
   const newVerifier = await buildVerifier(newPw);
   localStorage.setItem(vKey(_activeId,'verifier'), newVerifier);
-
-  // Update in-memory password
   _masterPw = newPw;
-
-  // Re-persist with new password
   await persistEntries();
 
-  clearIds('chpw-current','chpw-new','chpw-confirm');
-  document.getElementById('chpw-strength-fill').style.cssText='width:0%';
-  document.getElementById('chpw-strength-label').textContent='';
-  err.textContent=''; err.classList.remove('show');
+  const newMethod = keepPasskey ? 'both' : 'password';
+  localStorage.setItem(vKey(_activeId,'method'), newMethod);
+  if (!keepPasskey) localStorage.removeItem(vKey(_activeId,'pkcred'));
 
-  toast('Password changed successfully.');
+  // Update index
+  const idx  = getIndex();
+  const info = idx.find(v=>v.id===_activeId);
+  if (info) { info.method = newMethod; saveIndex(idx); }
+
+  _pkChangeSecret = null;
+  closeModal('vault-settings');
+  toast(keepPasskey ? 'Password added — vault now uses both.' : 'Switched to password only.');
 }
 
-function deleteCurrentVault() {
+async function addPasswordToPasskeyVault()  { await _applyNewPasswordFromPasskeyChange(true);  }
+async function switchToPasswordOnly()       { await _applyNewPasswordFromPasskeyChange(false); }
+
+function confirmDeleteCurrentVault() {
   const idx  = getIndex();
   const info = idx.find(v => v.id === _activeId);
-  if (!confirm(`Delete vault "${info?.name||'this vault'}"? This is permanent.`)) return;
-  closeModal('vault-settings');
-  const id = _activeId;
-  lockVault();
-  deleteVaultData(id);
-  renderLockScreen();
-  toast('Vault deleted.');
+  _pendingDeleteVaultId = _activeId;
+  document.getElementById('confirm-delete-vault-msg').textContent =
+    `"${info?.name||'this vault'}" and all its data will be permanently deleted.`;
+  document.getElementById('confirm-delete-vault-btn').onclick = () => {
+    closeModal('confirm-delete-vault');
+    closeModal('vault-settings');
+    const id = _pendingDeleteVaultId;
+    lockVault();
+    deleteVaultData(id);
+    renderLockScreen();
+    toast('Vault deleted.');
+  };
+  openModal('confirm-delete-vault');
 }
 
 // ═══════════════════════════════════════════════════════════════════════
