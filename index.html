@@ -4,14 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vault</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext x='50%25' y='54%25' dominant-baseline='central' text-anchor='middle' font-family='Arial Black%2C sans-serif' font-weight='900' font-size='30' fill='%23f5a623'%3EV%3C/text%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext x='50%25' y='54%25' dominant-baseline='central' text-anchor='middle' font-family='Arial Black%2C sans-serif' font-weight='900' font-size='30' fill='%235865f2'%3EV%3C/text%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0f0f0f;--surface:#171717;--surface2:#1e1e1e;
-    --border:#262626;--border2:#333;
-    --accent:#f5a623;--accent2:#ffca6e;
-    --red:#e05252;--green:#4caf7d;--text:#e8e8e8;--muted:#777;--faint:#3a3a3a;
+    --bg:#111214;--surface:#1e1f22;--surface2:#2b2d31;
+    --border:#2a2b2f;--border2:#35373c;
+    --accent:#5865f2;--accent2:#7983f5;
+    --red:#f23f42;--green:#23a55a;--text:#dbdee1;--muted:#6d6f78;--faint:#25262a;
     --body:'Inter',sans-serif;
   }
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -41,7 +41,7 @@
   .vault-picker{display:flex;flex-direction:column;gap:5px;width:100%;margin-bottom:4px}
   .vault-pick-btn{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border2);padding:10px 13px;cursor:pointer;transition:border-color .15s;width:100%;text-align:left;border-radius:8px}
   .vault-pick-btn:hover{border-color:var(--faint)}
-  .vault-pick-btn.active{border-color:var(--accent);background:rgba(245,166,35,.06)}
+  .vault-pick-btn.active{border-color:var(--accent);background:rgba(88,101,242,.08)}
   .vault-pick-name{font-weight:500;font-size:14px;color:var(--text)}
   .vault-pick-meta{font-size:11px;color:var(--muted);margin-top:1px}
   .vault-pick-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;padding:3px 7px;border-radius:4px;transition:all .15s}
@@ -50,8 +50,8 @@
 
   /* buttons */
   .btn{font-family:var(--body);font-weight:500;font-size:14px;padding:10px 18px;border:none;cursor:pointer;transition:all .15s;outline:none;border-radius:8px}
-  .btn-primary{background:var(--accent);color:#fff}
-  .btn-primary:hover{background:var(--accent2);color:#111}
+  .btn-primary{background:var(--accent);color:#fff;font-weight:500}
+  .btn-primary:hover{background:var(--accent2);color:#fff}
   .btn-primary:disabled{opacity:.4;cursor:not-allowed}
   .btn-danger{background:rgba(224,92,92,.15);color:var(--red);border:1px solid rgba(224,92,92,.25)}
   .btn-danger:hover{background:rgba(224,92,92,.25)}
@@ -100,7 +100,7 @@
   .note-body{background:var(--bg);border:1px solid var(--border);padding:13px;font-size:13px;line-height:1.7;white-space:pre-wrap;word-break:break-word;max-height:280px;overflow-y:auto;color:var(--text);border-radius:6px}
 
   /* modal */
-  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(2px)}
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(2px)}
   .modal-overlay.open{display:flex}
   .modal{background:var(--surface);border:1px solid var(--border2);padding:24px;width:100%;max-width:440px;position:relative;animation:slide-up .18s ease;border-radius:12px}
   @keyframes slide-up{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
@@ -121,7 +121,7 @@
   /* method picker */
   .method-btn{display:flex;align-items:flex-start;gap:12px;background:var(--bg);border:1px solid var(--border2);padding:13px;cursor:pointer;text-align:left;transition:border-color .15s;width:100%;border-radius:9px}
   .method-btn:hover,.method-btn.selected{border-color:var(--accent)}
-  .method-btn.selected{background:rgba(245,166,35,.06)}
+  .method-btn.selected{background:rgba(88,101,242,.08)}
   .method-icon{font-size:18px;line-height:1;flex-shrink:0;margin-top:1px}
   .method-title{font-weight:500;font-size:14px;color:var(--text);margin-bottom:2px}
   .method-desc{font-size:11px;color:var(--muted);line-height:1.5}
@@ -130,13 +130,13 @@
 
   /* badge */
   .badge{display:inline-block;font-size:10px;font-weight:500;padding:2px 7px;border-radius:4px;margin-bottom:8px}
-  .badge.totp{background:rgba(245,166,35,.15);color:var(--accent)}
+  .badge.totp{background:rgba(88,101,242,.12);color:var(--accent)}
   .badge.note{background:rgba(82,194,122,.1);color:var(--green)}
   .badge.locked{background:rgba(224,92,92,.1);color:var(--red)}
   .empty{color:var(--muted);font-size:13px;padding:48px 0;text-align:center;border:1px dashed var(--border);grid-column:1/-1;border-radius:10px}
   .empty span{color:var(--accent)}
 
-  #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-size:13px;padding:9px 18px;border-radius:8px;opacity:0;transition:all .2s;pointer-events:none;z-index:9000;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.3)}
+  #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-size:13px;padding:9px 18px;border-radius:8px;opacity:0;transition:all .2s;pointer-events:none;z-index:9000;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.4)}
   #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
   ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
   @media(max-width:600px){#header,#topbar,#content{padding-left:16px;padding-right:16px}.card-grid{grid-template-columns:1fr}}
