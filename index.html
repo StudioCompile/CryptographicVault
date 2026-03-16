@@ -410,64 +410,72 @@
       <input type="text" id="settings-name" placeholder="e.g. Personal, Work…" autocomplete="off">
     </div>
 
-    <!-- Change credential — contents swapped by JS based on method -->
+    <!-- Change credential -->
     <div style="border-top:1px solid var(--border);padding-top:14px;margin-bottom:14px">
-      <p style="font-size:11px;color:var(--muted);margin-bottom:12px;letter-spacing:.5px" id="chpw-section-title">CHANGE PASSWORD</p>
+      <p style="font-size:11px;color:var(--muted);margin-bottom:12px;letter-spacing:.5px">CHANGE UNLOCK METHOD</p>
 
-      <!-- Password mode -->
-      <div id="chpw-pw-mode">
-        <div class="form-row">
+      <!-- Step 1: verify current credential -->
+      <div id="cred-step-verify">
+        <p style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.6" id="cred-verify-hint">Verify your current password to change your unlock method.</p>
+        <div id="cred-verify-pw-row" class="form-row">
           <label>Current Password</label>
-          <input type="password" id="chpw-current" placeholder="Your current password…"
+          <input type="password" id="cred-verify-pw" placeholder="Your current password…"
             autocomplete="off" data-lpignore="true" data-form-type="other"
             readonly onfocus="this.removeAttribute('readonly')">
         </div>
-        <div class="form-row">
+        <div class="form-err" id="cred-verify-err"></div>
+        <div style="display:flex;gap:8px;margin-top:4px">
+          <button class="btn btn-ghost btn-full" id="cred-verify-pw-btn" onclick="verifyCurrentCredential('password')">VERIFY PASSWORD</button>
+          <button class="btn btn-ghost btn-full" id="cred-verify-pk-btn" onclick="verifyCurrentCredential('passkey')" style="display:none">🪪 VERIFY PASSKEY</button>
+        </div>
+      </div>
+
+      <!-- Step 2: pick new method (same cards as create vault) -->
+      <div id="cred-step-pick" style="display:none">
+        <p style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.6">✓ Verified. Now choose your new unlock method:</p>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="method-btn" id="cred-mb-pw"   onclick="pickCredMethod('password')">
+            <div class="method-icon">🔑</div>
+            <div><div class="method-title">Password only</div><div class="method-desc">Type a password to unlock. Supports share links.</div></div>
+          </button>
+          <button class="method-btn" id="cred-mb-pk"   onclick="pickCredMethod('passkey')">
+            <div class="method-icon">🪪</div>
+            <div><div class="method-title">Passkey only</div><div class="method-desc">Fingerprint, Face ID, or PIN. This device only.</div></div>
+          </button>
+          <button class="method-btn" id="cred-mb-both" onclick="pickCredMethod('both')">
+            <div class="method-icon">🛡</div>
+            <div><div class="method-title">Both</div><div class="method-desc">Passkey for quick unlock, password for share links.</div></div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 3: enter new password (if method needs one) -->
+      <div id="cred-step-pw" style="display:none">
+        <div class="form-row" style="margin-top:10px">
           <label>New Password</label>
-          <input type="password" id="chpw-new" placeholder="At least 12 characters…"
+          <input type="password" id="cred-new-pw" placeholder="At least 12 characters…"
             autocomplete="off" data-lpignore="true" data-form-type="other"
             readonly onfocus="this.removeAttribute('readonly')">
-          <div class="strength-bar"><div class="strength-fill" id="chpw-strength-fill"></div></div>
-          <div style="font-size:10px;color:var(--muted);margin-top:4px" id="chpw-strength-label"></div>
+          <div class="strength-bar"><div class="strength-fill" id="cred-strength-fill"></div></div>
+          <div style="font-size:10px;color:var(--muted);margin-top:4px" id="cred-strength-label"></div>
         </div>
         <div class="form-row">
           <label>Confirm New Password</label>
-          <input type="password" id="chpw-confirm" placeholder="Type new password again…"
+          <input type="password" id="cred-confirm-pw" placeholder="Type new password again…"
             autocomplete="off" data-lpignore="true" data-form-type="other"
             readonly onfocus="this.removeAttribute('readonly')">
         </div>
-        <div class="form-err" id="chpw-err"></div>
-        <button class="btn btn-ghost btn-full" onclick="changePassword()" style="margin-top:4px">CHANGE PASSWORD</button>
       </div>
 
-      <!-- Passkey-only mode -->
-      <div id="chpw-pk-mode" style="display:none">
-        <p style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.7">
-          This vault uses a passkey. Verify it first, then choose what to do.
-        </p>
-        <div id="chpw-pk-verified-section" style="display:none">
-          <div class="form-row">
-            <label>New Password</label>
-            <input type="password" id="chpw-pk-new" placeholder="At least 12 characters…"
-              autocomplete="off" data-lpignore="true" data-form-type="other"
-              readonly onfocus="this.removeAttribute('readonly')">
-            <div class="strength-bar"><div class="strength-fill" id="chpw-pk-strength-fill"></div></div>
-            <div style="font-size:10px;color:var(--muted);margin-top:4px" id="chpw-pk-strength-label"></div>
-          </div>
-          <div class="form-row">
-            <label>Confirm New Password</label>
-            <input type="password" id="chpw-pk-confirm" placeholder="Type new password again…"
-              autocomplete="off" data-lpignore="true" data-form-type="other"
-              readonly onfocus="this.removeAttribute('readonly')">
-          </div>
-          <p style="font-size:11px;color:var(--muted);margin-bottom:8px">What would you like to do?</p>
-          <div style="display:flex;flex-direction:column;gap:6px">
-            <button class="btn btn-ghost btn-full" onclick="addPasswordToPasskeyVault()">ADD PASSWORD &amp; KEEP PASSKEY</button>
-            <button class="btn btn-ghost btn-full" onclick="switchToPasswordOnly()">SWITCH TO PASSWORD ONLY (removes passkey)</button>
-          </div>
-        </div>
-        <div class="form-err" id="chpw-pk-err"></div>
-        <button class="btn btn-ghost btn-full" id="chpw-pk-verify-btn" onclick="verifyPasskeyForChange()" style="margin-top:4px">🪪 VERIFY WITH PASSKEY FIRST</button>
+      <!-- Step 3b: passkey registration status -->
+      <div id="cred-step-pk-status" style="display:none">
+        <p style="font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6" id="cred-pk-status-msg">Click Apply and your browser will ask you to set up a passkey.</p>
+      </div>
+
+      <div class="form-err" id="cred-apply-err"></div>
+      <div style="display:flex;gap:8px;margin-top:10px" id="cred-apply-row" style="display:none">
+        <button class="btn btn-ghost btn-full" onclick="credBack()">BACK</button>
+        <button class="btn btn-primary btn-full" id="cred-apply-btn" onclick="applyCredChange()">APPLY</button>
       </div>
     </div>
 
@@ -1322,24 +1330,13 @@ document.getElementById('new-pw').addEventListener('input',function(){
 });
 
 // Strength meter for change-password field in settings
-document.getElementById('chpw-new').addEventListener('input',function(){
-  const val=this.value,est=estimateCrackTime(val);
-  let checks=[val.length>=8,val.length>=12,val.length>=16,/[A-Z]/.test(val)&&/[a-z]/.test(val),/[0-9]/.test(val),/[^a-zA-Z0-9]/.test(val)];
-  const s=checks.filter(Boolean).length,pct=Math.min(100,(s/6)*100),col=!est?'var(--red)':est.color;
-  document.getElementById('chpw-strength-fill').style.cssText=`width:${pct}%;background:${col}`;
-  const lbl=document.getElementById('chpw-strength-label');
-  if(!val){lbl.textContent='';return;}
-  lbl.style.color=col;
-  lbl.textContent=est?(val.length<12?`Time to crack: ${est.label} ⚠ needs 12+ chars`:`Time to crack: ${est.label}`):'Enter a password';
-});
-
-// Strength meter for passkey-mode new password
-document.getElementById('chpw-pk-new').addEventListener('input',function(){
-  const val=this.value,est=estimateCrackTime(val);
-  let checks=[val.length>=8,val.length>=12,val.length>=16,/[A-Z]/.test(val)&&/[a-z]/.test(val),/[0-9]/.test(val),/[^a-zA-Z0-9]/.test(val)];
-  const s=checks.filter(Boolean).length,pct=Math.min(100,(s/6)*100),col=!est?'var(--red)':est.color;
-  document.getElementById('chpw-pk-strength-fill').style.cssText=`width:${pct}%;background:${col}`;
-  const lbl=document.getElementById('chpw-pk-strength-label');
+// Strength meter for new password in credential change flow
+document.getElementById('cred-new-pw').addEventListener('input', function(){
+  const val=this.value, est=estimateCrackTime(val);
+  const checks=[val.length>=8,val.length>=12,val.length>=16,/[A-Z]/.test(val)&&/[a-z]/.test(val),/[0-9]/.test(val),/[^a-zA-Z0-9]/.test(val)];
+  const s=checks.filter(Boolean).length, pct=Math.min(100,(s/6)*100), col=!est?'var(--red)':est.color;
+  document.getElementById('cred-strength-fill').style.cssText=`width:${pct}%;background:${col}`;
+  const lbl=document.getElementById('cred-strength-label');
   if(!val){lbl.textContent='';return;}
   lbl.style.color=col;
   lbl.textContent=est?(val.length<12?`Time to crack: ${est.label} ⚠ needs 12+ chars`:`Time to crack: ${est.label}`):'Enter a password';
@@ -1416,39 +1413,6 @@ document.addEventListener('visibilitychange', () => {
 
 window.addEventListener('pagehide', () => { if (_masterPw) lockVault(); });
 
-async function changePassword() {
-  const currentPw = document.getElementById('chpw-current').value;
-  const newPw     = document.getElementById('chpw-new').value;
-  const confirmPw = document.getElementById('chpw-confirm').value;
-  const err       = document.getElementById('chpw-err');
-  err.textContent=''; err.classList.remove('show');
-
-  if (!currentPw) { showErr(err,'Enter your current password.'); return; }
-  if (newPw.length < 12) { showErr(err,'New password needs at least 12 characters.'); return; }
-  if (newPw !== confirmPw) { showErr(err,"New passwords don't match — type them again."); return; }
-  if (newPw === currentPw) { showErr(err,'New password is the same as the current one.'); return; }
-
-  const verifier = localStorage.getItem(vKey(_activeId,'verifier'));
-  const valid    = await checkVerifier(currentPw, verifier);
-  if (!valid) { showErr(err,'Current password is wrong.'); clearIds('chpw-current'); return; }
-
-  const reencrypted = await Promise.all(_entries.map(e => encryptStr(JSON.stringify(e), newPw)));
-  localStorage.setItem(vKey(_activeId,'entries'), JSON.stringify(reencrypted));
-  for (const e of _entries) {
-    if (e.type==='note' && e.encBody && !e.hasExtra) {
-      const plain = await decryptStr(e.encBody, currentPw);
-      if (plain) e.encBody = await encryptStr(plain, newPw);
-    }
-  }
-  localStorage.setItem(vKey(_activeId,'verifier'), await buildVerifier(newPw));
-  _masterPw = newPw;
-  await persistEntries();
-  clearIds('chpw-current','chpw-new','chpw-confirm');
-  document.getElementById('chpw-strength-fill').style.cssText='width:0%';
-  document.getElementById('chpw-strength-label').textContent='';
-  toast('Password changed successfully.');
-}
-
 // ═══════════════════════════════════════════════════════════════════════
 //  IMPORT FROM SHARE LINK
 // ═══════════════════════════════════════════════════════════════════════
@@ -1486,30 +1450,10 @@ function confirmImport() {
 // ═══════════════════════════════════════════════════════════════════════
 
 function openVaultSettings() {
-  const idx    = getIndex();
-  const info   = idx.find(v => v.id === _activeId);
-  const method = localStorage.getItem(vKey(_activeId,'method')) || 'password';
+  const idx  = getIndex();
+  const info = idx.find(v => v.id === _activeId);
   document.getElementById('settings-name').value = info ? info.name : '';
-
-  // Show correct credential-change UI based on method
-  const isPasskeyOnly = method === 'passkey';
-  document.getElementById('chpw-pw-mode').style.display      = isPasskeyOnly ? 'none' : '';
-  document.getElementById('chpw-pk-mode').style.display      = isPasskeyOnly ? '' : 'none';
-  document.getElementById('chpw-section-title').textContent  = isPasskeyOnly ? 'CHANGE CREDENTIAL' : 'CHANGE PASSWORD';
-
-  // Reset all fields and states
-  clearIds('chpw-current','chpw-new','chpw-confirm','chpw-pk-new','chpw-pk-confirm');
-  ['chpw-err','chpw-pk-err'].forEach(id => {
-    const el = document.getElementById(id);
-    el.textContent=''; el.classList.remove('show');
-  });
-  ['chpw-strength-fill','chpw-pk-strength-fill'].forEach(id =>
-    document.getElementById(id).style.cssText='width:0%;background:var(--red)');
-  ['chpw-strength-label','chpw-pk-strength-label'].forEach(id =>
-    document.getElementById(id).textContent='');
-  document.getElementById('chpw-pk-verified-section').style.display='none';
-  document.getElementById('chpw-pk-verify-btn').style.display='';
-  document.getElementById('chpw-pk-verify-btn').textContent='🪪 VERIFY WITH PASSKEY FIRST';
+  resetCredFlow();
   openModal('vault-settings');
 }
 
@@ -1523,87 +1467,189 @@ function saveVaultSettings() {
   toast('Name saved.');
 }
 
-// ── Passkey-only credential change ────────────────────────────────────────
+// ── Unified credential change flow ────────────────────────────────────────
 
-let _pkChangeSecret = null; // the unwrapped vault secret after passkey verify
+let _credVerifiedSecret = null; // vault secret confirmed by current credential
+let _credNewMethod      = null; // method the user picked for the new setup
 
-async function verifyPasskeyForChange() {
-  const pkData = JSON.parse(localStorage.getItem(vKey(_activeId,'pkcred'))||'null');
-  if (!pkData) { showErr(document.getElementById('chpw-pk-err'),'No passkey data found.'); return; }
-  const btn = document.getElementById('chpw-pk-verify-btn');
-  btn.textContent = '🪪 Waiting for passkey…'; btn.disabled = true;
-  try {
-    const assertion = await navigator.credentials.get({ publicKey: {
-      challenge: rnd(32), rpId: rpId(),
-      allowCredentials: [{ type:'public-key', id:b64d(pkData.credId) }],
-      userVerification: 'required', timeout: 60000
-    }});
-    const secret = await unwrapSecretWithCred(pkData.wrappedSecret, b64e(assertion.rawId));
-    if (!secret) { showErr(document.getElementById('chpw-pk-err'),'Could not verify passkey.'); btn.textContent='🪪 VERIFY WITH PASSKEY FIRST'; btn.disabled=false; return; }
-    _pkChangeSecret = secret;
-    btn.style.display = 'none';
-    document.getElementById('chpw-pk-verified-section').style.display = '';
-    document.getElementById('chpw-pk-err').textContent='✓ Passkey verified — now set a password below.';
-    document.getElementById('chpw-pk-err').style.color='var(--green)';
-    document.getElementById('chpw-pk-err').classList.add('show');
-  } catch { showErr(document.getElementById('chpw-pk-err'),'Passkey cancelled.'); btn.textContent='🪪 VERIFY WITH PASSKEY FIRST'; btn.disabled=false; }
+function resetCredFlow() {
+  const method = localStorage.getItem(vKey(_activeId,'method')) || 'password';
+  const hasPasskey = method === 'passkey' || method === 'both';
+  const hasPassword = method === 'password' || method === 'both';
+
+  // Step 1 — show correct verify controls
+  document.getElementById('cred-step-verify').style.display  = '';
+  document.getElementById('cred-step-pick').style.display    = 'none';
+  document.getElementById('cred-step-pw').style.display      = 'none';
+  document.getElementById('cred-step-pk-status').style.display = 'none';
+  document.getElementById('cred-apply-row').style.display    = 'none';
+
+  document.getElementById('cred-verify-pw-row').style.display = hasPassword ? '' : 'none';
+  document.getElementById('cred-verify-pw-btn').style.display = hasPassword ? '' : 'none';
+  document.getElementById('cred-verify-pk-btn').style.display = hasPasskey  ? '' : 'none';
+  document.getElementById('cred-verify-hint').textContent = hasPassword && hasPasskey
+    ? 'Verify your current password or passkey to change your unlock method.'
+    : hasPasskey
+    ? 'Verify your passkey to change your unlock method.'
+    : 'Verify your current password to change your unlock method.';
+
+  clearIds('cred-verify-pw','cred-new-pw','cred-confirm-pw');
+  document.getElementById('cred-verify-err').textContent = '';
+  document.getElementById('cred-verify-err').classList.remove('show');
+  document.getElementById('cred-apply-err').textContent = '';
+  document.getElementById('cred-apply-err').classList.remove('show');
+  document.getElementById('cred-strength-fill').style.cssText = 'width:0%;background:var(--red)';
+  document.getElementById('cred-strength-label').textContent = '';
+  document.querySelectorAll('#cred-step-pick .method-btn').forEach(b => b.classList.remove('selected'));
+  document.getElementById('cred-apply-btn').disabled = false;
+  document.getElementById('cred-apply-btn').textContent = 'APPLY';
+  _credVerifiedSecret = null;
+  _credNewMethod      = null;
 }
 
-async function _applyNewPasswordFromPasskeyChange(keepPasskey) {
-  const newPw  = document.getElementById('chpw-pk-new').value;
-  const conf   = document.getElementById('chpw-pk-confirm').value;
-  const err    = document.getElementById('chpw-pk-err');
-  err.style.color='var(--red)';
-  if (newPw.length < 12) { showErr(err,'Password needs at least 12 characters.'); return; }
-  if (newPw !== conf)    { showErr(err,"Passwords don't match."); return; }
-  if (!_pkChangeSecret)  { showErr(err,'Verify your passkey first.'); return; }
+function credBack() {
+  // Go back to step 1 but keep verified secret
+  document.getElementById('cred-step-pick').style.display      = _credVerifiedSecret ? '' : 'none';
+  document.getElementById('cred-step-pw').style.display        = 'none';
+  document.getElementById('cred-step-pk-status').style.display = 'none';
+  document.getElementById('cred-apply-row').style.display      = 'none';
+  document.getElementById('cred-apply-err').textContent        = '';
+  document.getElementById('cred-apply-err').classList.remove('show');
+  document.querySelectorAll('#cred-step-pick .method-btn').forEach(b => b.classList.remove('selected'));
+  clearIds('cred-new-pw','cred-confirm-pw');
+  _credNewMethod = null;
+}
 
-  // Re-encrypt all entries with new password
-  const reencrypted = await Promise.all(_entries.map(e => encryptStr(JSON.stringify(e), newPw)));
-  localStorage.setItem(vKey(_activeId,'entries'), JSON.stringify(reencrypted));
-  // Re-encrypt notes without extra passwords
-  for (const e of _entries) {
-    if (e.type==='note' && e.encBody && !e.hasExtra) {
-      const plain = await decryptStr(e.encBody, _pkChangeSecret);
-      if (plain) e.encBody = await encryptStr(plain, newPw);
-    }
-  }
+async function verifyCurrentCredential(via) {
+  const err = document.getElementById('cred-verify-err');
+  err.textContent = ''; err.classList.remove('show');
 
-  const newVerifier = await buildVerifier(newPw);
-  localStorage.setItem(vKey(_activeId,'verifier'), newVerifier);
-  _masterPw = newPw;
-  await persistEntries();
-
-  const newMethod = keepPasskey ? 'both' : 'password';
-  localStorage.setItem(vKey(_activeId,'method'), newMethod);
-
-  if (keepPasskey) {
-    // Re-wrap the NEW password under the existing passkey credential.
-    // The passkey credId stays the same — we just update what it unlocks.
-    const pkData = JSON.parse(localStorage.getItem(vKey(_activeId,'pkcred'))||'null');
-    if (pkData) {
-      const newWrapped = await wrapSecretWithCred(newPw, pkData.credId);
-      localStorage.setItem(vKey(_activeId,'pkcred'), JSON.stringify({
-        credId: pkData.credId,
-        wrappedSecret: newWrapped
-      }));
-    }
+  if (via === 'password') {
+    const pw = document.getElementById('cred-verify-pw').value;
+    if (!pw) { showErr(err,'Enter your current password.'); return; }
+    const verifier = localStorage.getItem(vKey(_activeId,'verifier'));
+    const valid    = await checkVerifier(pw, verifier);
+    if (!valid) { showErr(err,'Wrong password. Try again.'); clearIds('cred-verify-pw'); return; }
+    _credVerifiedSecret = pw;
   } else {
-    localStorage.removeItem(vKey(_activeId,'pkcred'));
+    // passkey
+    if (!location.hostname) { showErr(err,'Passkeys only work when hosted — use your password instead.'); return; }
+    const pkData = JSON.parse(localStorage.getItem(vKey(_activeId,'pkcred'))||'null');
+    if (!pkData) { showErr(err,'No passkey data found.'); return; }
+    const btn = document.getElementById('cred-verify-pk-btn');
+    btn.textContent='🪪 Waiting…'; btn.disabled=true;
+    try {
+      const assertion = await navigator.credentials.get({ publicKey: {
+        challenge:rnd(32), rpId:rpId(),
+        allowCredentials:[{type:'public-key',id:b64d(pkData.credId)}],
+        userVerification:'required', timeout:60000
+      }});
+      const secret = await unwrapSecretWithCred(pkData.wrappedSecret, b64e(assertion.rawId));
+      if (!secret) { showErr(err,'Could not verify passkey.'); btn.textContent='🪪 VERIFY PASSKEY'; btn.disabled=false; return; }
+      _credVerifiedSecret = secret;
+    } catch { showErr(err,'Passkey cancelled.'); btn.textContent='🪪 VERIFY PASSKEY'; btn.disabled=false; return; }
+    btn.textContent='🪪 VERIFY PASSKEY'; btn.disabled=false;
   }
 
-  // Update index
-  const idx  = getIndex();
-  const info = idx.find(v=>v.id===_activeId);
-  if (info) { info.method = newMethod; saveIndex(idx); }
-
-  _pkChangeSecret = null;
-  closeModal('vault-settings');
-  toast(keepPasskey ? 'Password added — vault now uses both.' : 'Switched to password only.');
+  // Move to step 2 — show picker
+  document.getElementById('cred-step-verify').style.display = 'none';
+  document.getElementById('cred-step-pick').style.display   = '';
 }
 
-async function addPasswordToPasskeyVault()  { await _applyNewPasswordFromPasskeyChange(true);  }
-async function switchToPasswordOnly()       { await _applyNewPasswordFromPasskeyChange(false); }
+function pickCredMethod(m) {
+  _credNewMethod = m;
+  document.querySelectorAll('#cred-step-pick .method-btn').forEach(b => b.classList.remove('selected'));
+  const map = {password:'cred-mb-pw', passkey:'cred-mb-pk', both:'cred-mb-both'};
+  document.getElementById(map[m]).classList.add('selected');
+
+  const needsPw = m === 'password' || m === 'both';
+  const needsPk = m === 'passkey'  || m === 'both';
+  document.getElementById('cred-step-pw').style.display        = needsPw ? '' : 'none';
+  document.getElementById('cred-step-pk-status').style.display = needsPk ? '' : 'none';
+  document.getElementById('cred-apply-row').style.display      = '';
+
+  if (needsPk) {
+    document.getElementById('cred-pk-status-msg').textContent = m === 'both'
+      ? 'A passkey will be registered after you set the password.'
+      : 'Your browser will ask you to set up a passkey when you click Apply.';
+  }
+  document.getElementById('cred-apply-err').textContent = '';
+  document.getElementById('cred-apply-err').classList.remove('show');
+  clearIds('cred-new-pw','cred-confirm-pw');
+}
+
+async function applyCredChange() {
+  if (!_credNewMethod) return;
+  const err = document.getElementById('cred-apply-err');
+  err.textContent=''; err.classList.remove('show');
+  const btn = document.getElementById('cred-apply-btn');
+  btn.disabled=true; btn.textContent='APPLYING…';
+
+  const needsPw = _credNewMethod === 'password' || _credNewMethod === 'both';
+  const needsPk = _credNewMethod === 'passkey'  || _credNewMethod === 'both';
+
+  let newPw = null;
+
+  if (needsPw) {
+    newPw = document.getElementById('cred-new-pw').value;
+    const conf = document.getElementById('cred-confirm-pw').value;
+    if (newPw.length < 12) { showErr(err,'Password needs at least 12 characters.'); btn.disabled=false; btn.textContent='APPLY'; return; }
+    if (newPw !== conf)    { showErr(err,"Passwords don't match."); btn.disabled=false; btn.textContent='APPLY'; return; }
+  } else {
+    // passkey-only: generate a new random secret as the vault key
+    newPw = b64e(rnd(32));
+  }
+
+  try {
+    // Re-encrypt entries from old secret to new password
+    const reencrypted = await Promise.all(_entries.map(e => encryptStr(JSON.stringify(e), newPw)));
+    localStorage.setItem(vKey(_activeId,'entries'), JSON.stringify(reencrypted));
+    // Re-encrypt note bodies
+    for (const e of _entries) {
+      if (e.type==='note' && e.encBody && !e.hasExtra) {
+        const plain = await decryptStr(e.encBody, _credVerifiedSecret);
+        if (plain) e.encBody = await encryptStr(plain, newPw);
+      }
+    }
+    localStorage.setItem(vKey(_activeId,'verifier'), await buildVerifier(newPw));
+    _masterPw = newPw;
+    await persistEntries();
+
+    // Handle passkey
+    if (needsPk) {
+      document.getElementById('cred-pk-status-msg').textContent = 'Registering passkey…';
+      const credData = await registerPasskey();
+      if (credData.error) {
+        if (_credNewMethod === 'both') {
+          // Passkey failed but password is set — fall back to password-only
+          document.getElementById('cred-pk-status-msg').textContent = '⚠ Passkey failed — saved as password only.';
+          _credNewMethod = 'password';
+        } else {
+          showErr(err, credData.error); btn.disabled=false; btn.textContent='APPLY'; return;
+        }
+      } else {
+        const wrapped = await wrapSecretWithCred(newPw, credData.credId);
+        localStorage.setItem(vKey(_activeId,'pkcred'), JSON.stringify({credId:credData.credId,wrappedSecret:wrapped}));
+      }
+    }
+
+    // Remove old passkey if new method doesn't include one
+    if (!needsPk) localStorage.removeItem(vKey(_activeId,'pkcred'));
+
+    localStorage.setItem(vKey(_activeId,'method'), _credNewMethod);
+    const idx  = getIndex();
+    const info = idx.find(v=>v.id===_activeId);
+    if (info) { info.method = _credNewMethod; saveIndex(idx); }
+
+    _credVerifiedSecret = null;
+    _credNewMethod      = null;
+    closeModal('vault-settings');
+    toast('Unlock method updated.');
+  } catch(e) {
+    showErr(err,'Error: '+e.message);
+    btn.disabled=false; btn.textContent='APPLY';
+  }
+}
 
 function confirmDeleteCurrentVault() {
   const idx  = getIndex();
