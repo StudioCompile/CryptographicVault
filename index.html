@@ -5,165 +5,165 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vault</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext x='50%25' y='54%25' dominant-baseline='central' text-anchor='middle' font-family='Arial Black%2C sans-serif' font-weight='900' font-size='30' fill='%23f5a623'%3EV%3C/text%3E%3C/svg%3E">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0f0f0f;--surface:#1a1a1a;--border:#2a2a2a;--border2:#383838;
-    --amber:#f5a623;--amber2:#ffca6e;--red:#e05252;--green:#4caf7d;
-    --blue:#4a9eff;--text:#e8e8e8;--muted:#888;
-    --body:'Inter',sans-serif;--display:'DM Sans',sans-serif;
+    --bg:#0f0f0f;--surface:#171717;--surface2:#1e1e1e;
+    --border:#262626;--border2:#333;
+    --accent:#f5a623;--accent2:#ffca6e;
+    --red:#e05252;--green:#4caf7d;--text:#e8e8e8;--muted:#777;--faint:#3a3a3a;
+    --body:'Inter',sans-serif;
   }
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  body{background:var(--bg);color:var(--text);font-family:var(--body);min-height:100vh;overflow-x:hidden;font-size:14px;line-height:1.5}
+  body{background:var(--bg);color:var(--text);font-family:var(--body);min-height:100vh;overflow-x:hidden;font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
 
   /* header */
-  #header{border-bottom:1px solid var(--border);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;background:var(--surface)}
-  .logo{font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:1px;color:var(--amber)}
-  .logo span{color:var(--muted);font-weight:400}
-  .status{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:8px}
-  .dot{width:7px;height:7px;border-radius:50%;background:var(--red);animation:pulse 2s infinite}
+  #header{padding:12px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:100}
+  .logo{font-weight:600;font-size:16px;color:var(--text);letter-spacing:-.2px}
+  .status{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:7px}
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--red);flex-shrink:0}
   .dot.unlocked{background:var(--green)}
-  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+  .hdr-btn{background:none;border:1px solid var(--border2);color:var(--muted);font-family:var(--body);font-size:12px;padding:5px 11px;border-radius:7px;cursor:pointer;transition:all .15s}
+  .hdr-btn:hover{color:var(--text);border-color:var(--border2);background:var(--surface)}
+  .hdr-btn.danger:hover{color:var(--red);border-color:rgba(224,82,82,.3)}
 
   /* lockscreen */
-  #lockscreen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 57px);padding:40px}
-  .lock-icon{font-size:56px;margin-bottom:20px;animation:float 3s ease-in-out infinite}
-  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-  #lockscreen h2{font-family:var(--display);font-weight:700;font-size:24px;color:var(--text);margin-bottom:8px;text-align:center}
-  #lockscreen p{color:var(--muted);font-size:13px;margin-bottom:28px;text-align:center;line-height:1.7;max-width:400px}
-  .lock-form{display:flex;flex-direction:column;gap:10px;width:100%;max-width:340px}
-  .lock-form input{background:var(--surface);border:1px solid var(--border2);color:var(--text);font-family:var(--body);font-size:14px;padding:11px 14px;outline:none;transition:border-color .2s;width:100%;border-radius:6px}
-  .lock-form input:focus{border-color:var(--amber)}
+  #lockscreen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 49px);padding:32px}
+  .lock-icon{font-size:40px;margin-bottom:18px}
+  #lockscreen h2{font-weight:600;font-size:20px;color:var(--text);margin-bottom:6px;text-align:center}
+  #lockscreen p{color:var(--muted);font-size:13px;margin-bottom:24px;text-align:center;line-height:1.6;max-width:360px}
+  .lock-form{display:flex;flex-direction:column;gap:8px;width:100%;max-width:320px}
+  .lock-form input{background:var(--surface);border:1px solid var(--border2);color:var(--text);font-family:var(--body);font-size:14px;padding:11px 13px;outline:none;transition:border-color .15s;width:100%;border-radius:8px}
+  .lock-form input:focus{border-color:var(--accent)}
   .lock-form input::placeholder{color:var(--muted)}
 
   /* vault picker */
-  .vault-picker{display:flex;flex-direction:column;gap:6px;width:100%;margin-bottom:4px}
-  .vault-pick-btn{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border2);padding:10px 14px;cursor:pointer;transition:border-color .15s;width:100%;text-align:left;border-radius:6px}
-  .vault-pick-btn:hover{border-color:var(--muted)}
-  .vault-pick-btn.active{border-color:var(--amber)}
-  .vault-pick-name{font-family:var(--display);font-weight:600;font-size:14px;color:var(--text)}
-  .vault-pick-meta{font-size:11px;color:var(--muted);margin-top:2px}
-  .vault-pick-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:2px 6px;line-height:1;transition:color .15s;border-radius:4px}
-  .vault-pick-del:hover{color:var(--red)}
-  .vault-divider{font-size:11px;color:var(--muted);text-align:center;padding:4px 0;border-top:1px solid var(--border);margin-top:2px}
+  .vault-picker{display:flex;flex-direction:column;gap:5px;width:100%;margin-bottom:4px}
+  .vault-pick-btn{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border2);padding:10px 13px;cursor:pointer;transition:border-color .15s;width:100%;text-align:left;border-radius:8px}
+  .vault-pick-btn:hover{border-color:var(--faint)}
+  .vault-pick-btn.active{border-color:var(--accent);background:rgba(245,166,35,.06)}
+  .vault-pick-name{font-weight:500;font-size:14px;color:var(--text)}
+  .vault-pick-meta{font-size:11px;color:var(--muted);margin-top:1px}
+  .vault-pick-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;padding:3px 7px;border-radius:4px;transition:all .15s}
+  .vault-pick-del:hover{color:var(--red);background:rgba(224,92,92,.1)}
+  .vault-divider{font-size:11px;color:var(--muted);text-align:center;padding:6px 0}
 
   /* buttons */
-  .btn{font-family:var(--display);font-weight:600;font-size:14px;letter-spacing:0;text-transform:none;padding:10px 20px;border:none;cursor:pointer;transition:all .15s;outline:none;border-radius:6px}
-  .btn-primary{background:var(--amber);color:#000}
-  .btn-primary:hover{background:var(--amber2)}
-  .btn-primary:disabled{opacity:.5;cursor:not-allowed}
-  .btn-danger{background:var(--red);color:#fff}
-  .btn-danger:hover{opacity:.85}
+  .btn{font-family:var(--body);font-weight:500;font-size:14px;padding:10px 18px;border:none;cursor:pointer;transition:all .15s;outline:none;border-radius:8px}
+  .btn-primary{background:var(--accent);color:#fff}
+  .btn-primary:hover{background:var(--accent2);color:#111}
+  .btn-primary:disabled{opacity:.4;cursor:not-allowed}
+  .btn-danger{background:rgba(224,92,92,.15);color:var(--red);border:1px solid rgba(224,92,92,.25)}
+  .btn-danger:hover{background:rgba(224,92,92,.25)}
   .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border2)}
-  .btn-ghost:hover{color:var(--text);background:var(--surface)}
+  .btn-ghost:hover{color:var(--text);border-color:var(--border2);background:var(--surface2)}
   .btn-sm{font-size:12px;padding:6px 12px}
-  .btn-icon{background:transparent;border:none;cursor:pointer;padding:6px;color:var(--muted);font-size:15px;transition:color .15s;line-height:1;border-radius:4px}
-  .btn-icon:hover{color:var(--text)}
-  .btn-icon.red:hover{color:var(--red)}
+  .btn-icon{background:transparent;border:none;cursor:pointer;padding:5px 7px;color:var(--muted);font-size:14px;transition:all .15s;line-height:1;border-radius:5px}
+  .btn-icon:hover{color:var(--text);background:var(--surface2)}
+  .btn-icon.red:hover{color:var(--red);background:rgba(224,92,92,.1)}
   .btn-full{width:100%}
 
-  #lock-msg{font-size:12px;text-align:center;min-height:16px}
+  #lock-msg{font-size:12px;text-align:center;min-height:16px;margin-top:2px}
   #lock-msg.err{color:var(--red)}
   #lock-msg.info{color:var(--muted)}
-  .reset-all-link{text-align:center;margin-top:2px}
-  .reset-all-link button{background:none;border:none;color:var(--muted);font-family:var(--body);font-size:11px;cursor:pointer;text-decoration:underline;padding:0}
-  .reset-all-link button:hover{color:var(--red)}
+  .reset-all-link{text-align:center;margin-top:4px}
+  .reset-all-link button{background:none;border:none;color:var(--muted);font-family:var(--body);font-size:11px;cursor:pointer;text-decoration:underline;padding:0;opacity:.7}
+  .reset-all-link button:hover{color:var(--red);opacity:1}
 
   /* app */
   #app{display:none}
   #app.visible{display:block}
-  #topbar{padding:10px 32px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;background:var(--surface);flex-wrap:wrap}
-  .tab-btn{font-family:var(--display);font-weight:500;font-size:13px;letter-spacing:0;text-transform:none;padding:7px 16px;background:transparent;border:1px solid transparent;color:var(--muted);cursor:pointer;transition:all .15s;border-radius:6px}
-  .tab-btn.active{color:var(--amber);border-color:rgba(245,166,35,.3);background:rgba(245,166,35,.07)}
-  .tab-btn:hover:not(.active){color:var(--text);background:rgba(255,255,255,.05)}
-  #topbar .spacer{flex:1}
-  .topbar-btn{font-family:var(--display);font-weight:500;font-size:12px;letter-spacing:0;text-transform:none;padding:6px 12px;background:transparent;border:1px solid var(--border2);color:var(--muted);cursor:pointer;transition:all .15s;border-radius:6px}
-  #lock-btn:hover{color:var(--red);border-color:rgba(224,82,82,.4)}
-  #share-btn:hover{color:var(--amber);border-color:rgba(245,166,35,.4)}
-  #settings-btn:hover{color:var(--text);border-color:var(--border2)}
-  .vault-name-badge{font-family:var(--display);font-size:12px;color:var(--muted);border-left:1px solid var(--border);padding-left:12px}
-
-  /* content */
-  #content{padding:28px 32px;max-width:1000px}
+  #content{padding:20px 24px;max-width:960px}
   .tab-panel{display:none}
   .tab-panel.active{display:block}
-  .sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
-  .sec-header h3{font-family:var(--display);font-weight:600;font-size:16px;color:var(--text)}
-  .count{font-size:11px;color:var(--muted);margin-left:8px}
+  .sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+  .tab-btn{font-family:var(--body);font-weight:500;font-size:13px;padding:6px 12px;background:transparent;border:none;border-bottom:2px solid transparent;color:var(--muted);cursor:pointer;transition:all .15s;border-radius:0}
+  .tab-btn.active{color:var(--text);border-bottom-color:var(--accent)}
+  .tab-btn:hover:not(.active){color:var(--text)}
+  .count{font-size:11px;color:var(--faint);margin-left:4px}
 
   /* cards */
-  .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
-  .entry-card{background:var(--surface);border:1px solid var(--border);padding:18px;position:relative;transition:border-color .2s;border-radius:8px}
+  .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+  .entry-card{background:var(--surface);border:1px solid var(--border);padding:16px;position:relative;border-radius:10px;transition:border-color .15s}
   .entry-card:hover{border-color:var(--border2)}
-  .card-label{font-family:var(--display);font-size:16px;font-weight:600;color:var(--text);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:60px}
-  .card-sub{font-size:11px;color:var(--muted);margin-bottom:14px}
-  .card-actions{position:absolute;top:12px;right:12px;display:flex;gap:2px}
-  .totp-code{font-size:30px;letter-spacing:4px;color:var(--amber);line-height:1;transition:color .3s;cursor:pointer;user-select:all;font-family:var(--display);font-weight:600}
+  .card-label{font-weight:500;font-size:15px;color:var(--text);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:56px}
+  .card-sub{font-size:11px;color:var(--muted);margin-bottom:12px}
+  .card-actions{position:absolute;top:10px;right:10px;display:flex;gap:1px}
+  .totp-code{font-size:28px;letter-spacing:5px;color:var(--text);line-height:1;cursor:pointer;user-select:all;font-weight:300;transition:color .2s}
   .totp-code.warn{color:var(--red)}
   .totp-code.copy-flash{color:var(--green)}
   .totp-bar-wrap{margin-top:10px;height:2px;background:var(--border);overflow:hidden;border-radius:1px}
-  .totp-bar{height:100%;background:var(--amber);transition:width .9s linear,background .3s}
+  .totp-bar{height:100%;background:var(--accent);transition:width .9s linear,background .3s}
   .totp-bar.warn{background:var(--red)}
-  .totp-remaining{font-size:10px;color:var(--muted);margin-top:4px;text-align:right}
+  .totp-remaining{font-size:10px;color:var(--muted);margin-top:3px;text-align:right}
   .note-locked{color:var(--muted);font-size:12px}
-  .note-body{background:var(--bg);border:1px solid var(--border);padding:14px;font-size:13px;line-height:1.7;white-space:pre-wrap;word-break:break-word;max-height:300px;overflow-y:auto;color:var(--text);border-radius:4px}
+  .note-body{background:var(--bg);border:1px solid var(--border);padding:13px;font-size:13px;line-height:1.7;white-space:pre-wrap;word-break:break-word;max-height:280px;overflow-y:auto;color:var(--text);border-radius:6px}
 
   /* modal */
-  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;align-items:center;justify-content:center;padding:20px}
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:1000;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(2px)}
   .modal-overlay.open{display:flex}
-  .modal{background:var(--surface);border:1px solid var(--border2);padding:28px;width:100%;max-width:460px;position:relative;animation:slide-up .2s ease;border-radius:10px}
-  @keyframes slide-up{from{transform:translateY(10px);opacity:0}to{transform:none;opacity:1}}
-  .modal h3{font-family:var(--display);font-weight:700;font-size:18px;color:var(--text);margin-bottom:18px}
-  .modal-close{position:absolute;top:14px;right:14px;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;line-height:1;transition:color .15s;border-radius:4px;padding:2px 6px}
-  .modal-close:hover{color:var(--text);background:rgba(255,255,255,.08)}
-  .modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+  .modal{background:var(--surface);border:1px solid var(--border2);padding:24px;width:100%;max-width:440px;position:relative;animation:slide-up .18s ease;border-radius:12px}
+  @keyframes slide-up{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
+  .modal h3{font-weight:600;font-size:16px;color:var(--text);margin-bottom:16px}
+  .modal-close{position:absolute;top:12px;right:12px;background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;line-height:1;transition:all .15s;border-radius:5px;padding:4px 7px;width:28px;height:28px;display:flex;align-items:center;justify-content:center}
+  .modal-close:hover{color:var(--text);background:var(--surface2)}
+  .modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:18px}
 
   /* forms */
-  .form-row{margin-bottom:14px}
-  .form-row label{display:block;font-size:11px;font-weight:500;color:var(--muted);margin-bottom:5px;text-transform:none;letter-spacing:0}
-  .form-row input,.form-row textarea{width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);font-family:var(--body);font-size:13px;padding:10px 12px;outline:none;transition:border-color .2s;resize:vertical;border-radius:6px}
-  .form-row input:focus,.form-row textarea:focus{border-color:var(--amber)}
+  .form-row{margin-bottom:13px}
+  .form-row label{display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:5px}
+  .form-row input,.form-row textarea{width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);font-family:var(--body);font-size:13px;padding:9px 11px;outline:none;transition:border-color .15s;resize:vertical;border-radius:7px}
+  .form-row input:focus,.form-row textarea:focus{border-color:var(--accent)}
   .form-row input::placeholder,.form-row textarea::placeholder{color:var(--muted)}
   .form-err{color:var(--red);font-size:12px;margin-top:5px;display:none}
   .form-err.show{display:block}
 
   /* method picker */
-  .method-btn{display:flex;align-items:flex-start;gap:14px;background:var(--bg);border:1px solid var(--border2);padding:14px;cursor:pointer;text-align:left;transition:border-color .15s;width:100%;border-radius:8px}
-  .method-btn:hover,.method-btn.selected{border-color:var(--amber)}
-  .method-btn.selected{background:rgba(245,166,35,.05)}
-  .method-icon{font-size:20px;line-height:1;flex-shrink:0;margin-top:2px}
-  .method-title{font-family:var(--display);font-weight:600;font-size:14px;color:var(--text);margin-bottom:3px}
+  .method-btn{display:flex;align-items:flex-start;gap:12px;background:var(--bg);border:1px solid var(--border2);padding:13px;cursor:pointer;text-align:left;transition:border-color .15s;width:100%;border-radius:9px}
+  .method-btn:hover,.method-btn.selected{border-color:var(--accent)}
+  .method-btn.selected{background:rgba(245,166,35,.06)}
+  .method-icon{font-size:18px;line-height:1;flex-shrink:0;margin-top:1px}
+  .method-title{font-weight:500;font-size:14px;color:var(--text);margin-bottom:2px}
   .method-desc{font-size:11px;color:var(--muted);line-height:1.5}
   .strength-bar{height:3px;background:var(--border);margin-top:6px;border-radius:2px}
   .strength-fill{height:100%;transition:width .3s,background .3s;width:0%;background:var(--red);border-radius:2px}
 
   /* badge */
-  .badge{display:inline-block;font-size:10px;font-weight:500;padding:2px 7px;border-radius:4px;margin-bottom:6px;letter-spacing:0}
-  .badge.totp{background:rgba(245,166,35,.15);color:var(--amber)}
-  .badge.note{background:rgba(74,158,255,.15);color:var(--blue)}
-  .badge.locked{background:rgba(224,82,82,.15);color:var(--red)}
-  .empty{color:var(--muted);font-size:13px;padding:40px 0;text-align:center;border:1px dashed var(--border);grid-column:1/-1;border-radius:8px}
-  .empty span{color:var(--amber)}
+  .badge{display:inline-block;font-size:10px;font-weight:500;padding:2px 7px;border-radius:4px;margin-bottom:8px}
+  .badge.totp{background:rgba(245,166,35,.15);color:var(--accent)}
+  .badge.note{background:rgba(82,194,122,.1);color:var(--green)}
+  .badge.locked{background:rgba(224,92,92,.1);color:var(--red)}
+  .empty{color:var(--muted);font-size:13px;padding:48px 0;text-align:center;border:1px dashed var(--border);grid-column:1/-1;border-radius:10px}
+  .empty span{color:var(--accent)}
 
-  #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface);border:1px solid var(--border2);color:var(--text);font-size:12px;padding:10px 20px;letter-spacing:1px;opacity:0;transition:all .25s;pointer-events:none;z-index:9000;white-space:nowrap}
+  #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-size:13px;padding:9px 18px;border-radius:8px;opacity:0;transition:all .2s;pointer-events:none;z-index:9000;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.3)}
   #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-  ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border2)}
-  @media(max-width:600px){#header,#topbar,#content{padding-left:16px;padding-right:16px}.logo{font-size:20px}.card-grid{grid-template-columns:1fr}}
+  ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+  @media(max-width:600px){#header,#topbar,#content{padding-left:16px;padding-right:16px}.card-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 
 <div id="header">
-  <div class="logo">V<span>ault</span></div>
-  <div class="status">
-    <div class="dot" id="status-dot"></div>
-    <span id="status-text">Locked</span>
+  <div style="display:flex;align-items:center;gap:10px">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="3" y="11" width="18" height="12" rx="2" fill="none" stroke="var(--accent)" stroke-width="1.8"/>
+      <path d="M7 11V7a5 5 0 0 1 10 0v4" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round"/>
+      <circle cx="12" cy="16" r="1.5" fill="var(--accent)"/>
+    </svg>
+    <span id="header-title" class="logo">Vault</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <div class="status">
+      <div class="dot" id="status-dot"></div>
+      <span id="status-text">Locked</span>
+    </div>
+    <div id="header-actions" style="display:flex;gap:6px"></div>
   </div>
 </div>
 
 <!-- ══ LOCK SCREEN ══ -->
 <div id="lockscreen">
-  <div class="lock-icon">🔐</div>
   <h2 id="lock-title">Welcome back</h2>
   <p id="lock-desc">Everything is encrypted and only stored on your device. Your password is never saved anywhere.</p>
   <div class="lock-form">
@@ -176,38 +176,30 @@
         onkeydown="if(event.key==='Enter')unlock()">
       <div id="lock-msg" style="margin-top:4px"></div>
       <button class="btn btn-primary btn-full" id="unlock-btn" onclick="unlock()" style="margin-top:6px">Open my vault</button>
-      <button class="btn btn-ghost btn-full" id="passkey-btn" onclick="unlockWithPasskey()" style="display:none;margin-top:6px">🪪 Use passkey instead</button>
+      <button class="btn btn-ghost btn-full" id="passkey-btn" onclick="unlockWithPasskey()" style="display:none;margin-top:6px">Use passkey instead</button>
     </div>
     <div class="vault-divider" id="vault-divider" style="display:none">or</div>
-    <button class="btn btn-ghost btn-full" onclick="openModal('create-vault')">Create a vault</button>
+    <button class="btn btn-ghost btn-full" onclick="openModal('create-vault')">New vault</button>
     <div class="reset-all-link"><button onclick="confirmResetAll()">delete all vault data</button></div>
   </div>
 </div>
 
 <!-- ══ APP ══ -->
 <div id="app">
-  <div id="topbar">
-    <button class="tab-btn active" onclick="switchTab('totp',this)">⏱ 2FA Codes</button>
-    <button class="tab-btn" onclick="switchTab('notes',this)">📝 Notes</button>
-    <div class="spacer"></div>
-    <span class="vault-name-badge" id="active-vault-name"></span>
-    <button class="topbar-btn" id="settings-btn" onclick="openVaultSettings()">⚙ Settings</button>
-    <button class="topbar-btn" id="share-btn" onclick="openShareModal()">🔗 Share</button>
-    <button class="topbar-btn" id="lock-btn" onclick="lockVault()">🔒 Lock</button>
-  </div>
   <div id="content">
-    <div id="tab-totp" class="tab-panel active">
-      <div class="sec-header">
-        <h3>2FA Codes <span class="count" id="totp-count"></span></h3>
-        <button class="btn btn-primary btn-sm" onclick="openModal('add-totp')">+ Add code</button>
+    <div class="sec-header">
+      <div style="display:flex;gap:2px">
+        <button class="tab-btn active" id="tabbtn-totp" onclick="switchTab('totp',this)">2FA Codes <span class="count" id="totp-count"></span></button>
+        <button class="tab-btn" id="tabbtn-notes" onclick="switchTab('notes',this)">Notes <span class="count" id="notes-count"></span></button>
       </div>
+      <div>
+        <button class="btn btn-primary btn-sm" id="add-btn" onclick="openAddModal()">+ Add</button>
+      </div>
+    </div>
+    <div id="tab-totp" class="tab-panel active">
       <div class="card-grid" id="totp-list"></div>
     </div>
     <div id="tab-notes" class="tab-panel">
-      <div class="sec-header">
-        <h3>Notes <span class="count" id="notes-count"></span></h3>
-        <button class="btn btn-primary btn-sm" onclick="openModal('add-note')">+ Add note</button>
-      </div>
       <div class="card-grid" id="notes-list"></div>
     </div>
   </div>
@@ -228,15 +220,15 @@
       <p style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.7">How do you want to unlock it?</p>
       <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:4px">
         <button class="method-btn" id="mb-pw"   onclick="pickMethod('password')">
-          <div class="method-icon">🔑</div>
+          <div class="method-icon" style="font-size:15px;color:var(--muted)">pw</div>
           <div><div class="method-title">Password</div><div class="method-desc">Type a password to unlock. Lets you transfer it to other devices via a link.</div></div>
         </button>
         <button class="method-btn" id="mb-pk"   onclick="pickMethod('passkey')">
-          <div class="method-icon">🪪</div>
+          <div class="method-icon" style="font-size:15px;color:var(--muted)">id</div>
           <div><div class="method-title">Passkey (fingerprint / Face ID)</div><div class="method-desc">Use your device's biometrics or PIN. Works on this device only.</div></div>
         </button>
         <button class="method-btn" id="mb-both" onclick="pickMethod('both')">
-          <div class="method-icon">🛡</div>
+          <div class="method-icon" style="font-size:15px;color:var(--muted)">++</div>
           <div><div class="method-title">Both</div><div class="method-desc">Quick biometric unlock on this device, plus a password for sharing.</div></div>
         </button>
       </div>
@@ -278,24 +270,24 @@
     <button class="modal-close" onclick="closeModal('add-totp')">✕</button>
     <h3>Add a 2FA code</h3>
     <div class="form-row">
-      <label>Name — which account is this?</label>
-      <input type="text" id="totp-label" placeholder="e.g. GitHub – username" autocomplete="off">
+      <label>Name</label>
+      <input type="text" id="totp-label" placeholder="e.g. GitHub" autocomplete="off">
     </div>
     <div class="form-row">
-      <label>Secret code — shown when you enable 2FA on the website</label>
+      <label>Secret code</label>
       <input type="text" id="totp-secret" placeholder="e.g. JBSWY3DPEHPK3PXP" autocomplete="off" spellcheck="false" style="letter-spacing:2px">
     </div>
     <div class="form-row">
-      <label>Website or app (optional)</label>
+      <label>Issuer</label>
       <input type="text" id="totp-issuer" placeholder="e.g. GitHub" autocomplete="off">
     </div>
     <div class="form-row">
-      <label>Code refreshes every ___ seconds (leave at 30 unless told otherwise)</label>
+      <label>Refresh interval (seconds)</label>
       <input type="number" id="totp-period" value="30" min="15" max="120">
     </div>
     <div class="form-row">
       <label>Notes (optional)</label>
-      <textarea id="totp-notes" rows="2" placeholder="Anything you want to remember…"></textarea>
+      <textarea id="totp-notes" rows="2" placeholder=""></textarea>
     </div>
     <div class="form-err" id="add-totp-err"></div>
     <div class="modal-footer">
@@ -316,11 +308,11 @@
     </div>
     <div class="form-row">
       <label>Note</label>
-      <textarea id="note-body" rows="5" placeholder="Type anything here…" autocomplete="off"></textarea>
+      <textarea id="note-body" rows="5" placeholder="" autocomplete="off"></textarea>
     </div>
     <div class="form-row">
-      <label>Extra password (optional) — adds a second lock to just this note</label>
-      <input type="password" id="note-extra-pw" placeholder="Leave blank to use your main password"
+      <label>Extra password (optional)</label>
+      <input type="password" id="note-extra-pw" placeholder="Leave blank for none"
         autocomplete="off" data-lpignore="true" data-form-type="other"
         readonly onfocus="this.removeAttribute('readonly')">
     </div>
@@ -384,7 +376,7 @@
     <div class="form-row">
       <label>Your link — click to select all</label>
       <div id="share-url"
-        style="font-size:11px;word-break:break-all;cursor:text;background:var(--bg);border:1px solid var(--border2);padding:10px 12px;line-height:1.7;min-height:72px;color:var(--text);user-select:all;border-radius:6px"
+        style="font-size:11px;word-break:break-all;cursor:text;background:var(--bg);border:1px solid var(--border2);padding:10px 12px;line-height:1.7;max-height:100px;overflow-y:auto;color:var(--text);user-select:all;border-radius:6px"
         onclick="selectShareUrl()"></div>
     </div>
     <p style="font-size:11px;color:var(--muted);margin-bottom:4px">Only send this to yourself — it contains your private encrypted data.</p>
@@ -407,7 +399,7 @@
     </div>
 
     <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px">
-      <button class="btn btn-ghost btn-full" onclick="openCredentialChange()">🔑 Change how you unlock this vault</button>
+      <button class="btn btn-ghost btn-full" onclick="openCredentialChange()">Change unlock method</button>
     </div>
 
     <div style="border-top:1px solid var(--border);padding-top:14px">
@@ -443,7 +435,7 @@
       <div class="form-err" id="cred-verify-err"></div>
       <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
         <button class="btn btn-primary btn-full" id="cred-verify-pw-btn" onclick="verifyCurrentCredential('password')">Confirm password</button>
-        <button class="btn btn-ghost btn-full" id="cred-verify-pk-btn" onclick="verifyCurrentCredential('passkey')" style="display:none">🪪 Use passkey instead</button>
+        <button class="btn btn-ghost btn-full" id="cred-verify-pk-btn" onclick="verifyCurrentCredential('passkey')" style="display:none">Use passkey instead</button>
       </div>
     </div>
 
@@ -454,15 +446,15 @@
       </p>
       <div style="display:flex;flex-direction:column;gap:10px">
         <button class="method-btn" id="cred-mb-pw" onclick="pickCredMethod('password')">
-          <div class="method-icon">🔑</div>
+          <div class="method-icon" style="font-size:15px;color:var(--muted)">pw</div>
           <div><div class="method-title">Password</div><div class="method-desc">Type a password to unlock. Lets you transfer to other devices via a link.</div></div>
         </button>
         <button class="method-btn" id="cred-mb-pk" onclick="pickCredMethod('passkey')">
-          <div class="method-icon">🪪</div>
+          <div class="method-icon" style="font-size:15px;color:var(--muted)">id</div>
           <div><div class="method-title">Passkey (fingerprint / Face ID)</div><div class="method-desc">Use your device's biometrics or PIN. Works on this device only.</div></div>
         </button>
         <button class="method-btn" id="cred-mb-both" onclick="pickCredMethod('both')">
-          <div class="method-icon">🛡</div>
+          <div class="method-icon" style="font-size:15px;color:var(--muted)">++</div>
           <div><div class="method-title">Both</div><div class="method-desc">Quick biometric unlock on this device, plus a password for sharing.</div></div>
         </button>
       </div>
@@ -579,7 +571,7 @@
       </div>
     </div>
     <div class="form-row">
-      <label>Website or app</label>
+      <label>Issuer</label>
       <input type="text" id="edit-totp-issuer" autocomplete="off">
     </div>
     <div class="form-row">
@@ -773,7 +765,7 @@ function renderLockScreen() {
     unlockSec.style.display = 'none';
     divider.style.display   = 'none';
     document.getElementById('lock-title').textContent = 'Welcome';
-    document.getElementById('lock-desc').textContent  = 'Your 2FA codes and notes, fully encrypted and stored only on this device. Create a vault to get started.';
+    document.getElementById('lock-desc').textContent  = 'Your 2FA codes and notes, fully encrypted and stored only on this device. New vault to get started.';
     _selectedVaultId = null;
   } else {
     document.getElementById('lock-title').textContent = idx.length === 1 ? 'Welcome back' : 'Your vaults';
@@ -826,9 +818,9 @@ function configureUnlockUI(id) {
   pkBtn.style.display = (method === 'passkey' || method === 'both') ? '' : 'none';
 
   if (method === 'passkey') {
-    pkBtn.textContent = '🪪 Unlock with passkey';
+    pkBtn.textContent = 'Unlock with passkey';
   } else if (method === 'both') {
-    pkBtn.textContent = '🪪 Use passkey instead';
+    pkBtn.textContent = 'Use passkey instead';
   }
 }
 
@@ -1036,6 +1028,9 @@ function lockVault() {
   document.getElementById('lockscreen').style.display = '';
   document.getElementById('status-dot').classList.remove('unlocked');
   document.getElementById('status-text').textContent = 'Locked';
+  document.getElementById('header-title').textContent = 'Vault';
+  document.getElementById('header-actions').innerHTML = '';
+  document.title = 'Vault';
   setLockMsg('', '');
 
   // Close all open modals and wipe any in-progress sensitive state
@@ -1053,9 +1048,12 @@ function showApp() {
   document.getElementById('status-dot').classList.add('unlocked');
   document.getElementById('status-text').textContent='Unlocked';
   const info = getIndex().find(v=>v.id===_activeId);
-  document.getElementById('active-vault-name').textContent = info ? info.name : '';
-  // Always show share btn — passkey-only vaults show an explanation instead
-  document.getElementById('share-btn').style.display = '';
+  document.getElementById('header-title').textContent = info ? info.name : 'Vault';
+  document.title = info ? info.name : 'Vault';
+  document.getElementById('header-actions').innerHTML =
+    `<button class="hdr-btn" onclick="openShareModal()">Share</button>
+     <button class="hdr-btn" onclick="openVaultSettings()">Settings</button>
+     <button class="hdr-btn danger" onclick="lockVault()">Lock</button>`;
   renderTOTP(); renderNotes(); startTotpRefresh();
   resetIdleTimer();
 }
@@ -1142,7 +1140,7 @@ function openShareModal() {
     // Can't share — no password to encrypt with. Show explanation modal.
     document.getElementById('share-url').textContent = '';
     document.getElementById('share-url').innerHTML =
-      '<span style="color:var(--muted);font-size:12px;line-height:1.7">Share links are not available for passkey-only vaults because there is no password to protect the link with.<br><br>Go to <strong style="color:var(--text)">⚙ Settings → Change Credential</strong> to add a password, then share links will work.</span>';
+      '<span style="color:var(--muted);font-size:12px;line-height:1.7">Share links are not available for passkey-only vaults because there is no password to protect the link with.<br><br>Go to <strong style="color:var(--text)">Settings → Change Credential</strong> to add a password, then share links will work.</span>';
     openModal('share-link');
     return;
   }
@@ -1276,13 +1274,13 @@ function renderNotes() {
   list.innerHTML=notes.map(n=>`
     <div class="entry-card">
       <div class="card-actions">
-        <button class="btn-icon" title="View" onclick="viewNote('${n.id}')">👁</button>
+        <button class="btn-icon" title="View" onclick="viewNote('${n.id}')">↗</button>
         <button class="btn-icon red" title="Remove" onclick="removeNote('${n.id}')">✕</button>
       </div>
       <div class="badge note">Note</div>${n.hasExtra?`<span class="badge locked" style="margin-left:4px">Extra lock</span>`:''}
       <div class="card-label">${esc(n.title)}</div>
       <div class="card-sub">Saved ${new Date(n.created).toLocaleDateString()}</div>
-      <div class="note-locked">🔒 Locked — click 👁 to read</div>
+      <div class="note-locked">Locked — click ↗ to read</div>
     </div>`).join('');
 }
 
@@ -1372,10 +1370,16 @@ document.querySelectorAll('.modal-overlay').forEach(ov=>ov.addEventListener('cli
 function clearIds(...ids){ids.forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});}
 function showErr(el,msg){el.textContent=msg;el.classList.add('show');}
 
-function switchTab(name,btn){
+let _activeTab = 'totp';
+function switchTab(name, btn){
+  _activeTab = name;
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById(`tab-${name}`).classList.add('active');btn.classList.add('active');
+  document.getElementById(`tab-${name}`).classList.add('active');
+  btn.classList.add('active');
+}
+function openAddModal(){
+  openModal(_activeTab === 'notes' ? 'add-note' : 'add-totp');
 }
 
 let _deleteCb=null;
@@ -1477,7 +1481,8 @@ function saveVaultSettings() {
   const idx  = getIndex();
   const info = idx.find(v => v.id === _activeId);
   if (info) { info.name = name; saveIndex(idx); }
-  document.getElementById('active-vault-name').textContent = name;
+  document.getElementById('header-title').textContent = name;
+  document.title = name;
   closeModal('vault-settings');
   toast('Name saved.');
 }
@@ -1575,7 +1580,7 @@ async function verifyCurrentCredential(via) {
     const pkData = JSON.parse(localStorage.getItem(vKey(_activeId,'pkcred'))||'null');
     if (!pkData) { showErr(err,'No passkey data found.'); return; }
     const btn = document.getElementById('cred-verify-pk-btn');
-    btn.textContent='🪪 Waiting…'; btn.disabled=true;
+    btn.textContent='Waiting…'; btn.disabled=true;
     try {
       const assertion = await navigator.credentials.get({ publicKey: {
         challenge:rnd(32), rpId:rpId(),
@@ -1583,10 +1588,10 @@ async function verifyCurrentCredential(via) {
         userVerification:'required', timeout:60000
       }});
       const secret = await unwrapSecretWithCred(pkData.wrappedSecret, b64e(assertion.rawId));
-      if (!secret) { showErr(err,'Could not verify passkey.'); btn.textContent='🪪 Use passkey instead'; btn.disabled=false; return; }
+      if (!secret) { showErr(err,'Could not verify passkey.'); btn.textContent='Use passkey instead'; btn.disabled=false; return; }
       _credVerifiedSecret = secret;
-    } catch { showErr(err,'Passkey cancelled.'); btn.textContent='🪪 Use passkey instead'; btn.disabled=false; return; }
-    btn.textContent='🪪 Use passkey instead'; btn.disabled=false;
+    } catch { showErr(err,'Passkey cancelled.'); btn.textContent='Use passkey instead'; btn.disabled=false; return; }
+    btn.textContent='Use passkey instead'; btn.disabled=false;
   }
 
   // Move to step 2 — show picker, show back button
