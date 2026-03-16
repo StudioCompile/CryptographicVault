@@ -3,53 +3,52 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VAULT</title>
+<title>Vault</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext x='50%25' y='54%25' dominant-baseline='central' text-anchor='middle' font-family='Arial Black%2C sans-serif' font-weight='900' font-size='30' fill='%23f5a623'%3EV%3C/text%3E%3C/svg%3E">
-<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0a0a0a;--surface:#111;--border:#222;--border2:#333;
+    --bg:#0f0f0f;--surface:#1a1a1a;--border:#2a2a2a;--border2:#383838;
     --amber:#f5a623;--amber2:#ffca6e;--red:#e05252;--green:#4caf7d;
-    --blue:#4a9eff;--text:#e8e8e8;--muted:#666;
-    --mono:'Share Tech Mono',monospace;--sans:'Barlow Condensed',sans-serif;
+    --blue:#4a9eff;--text:#e8e8e8;--muted:#888;
+    --body:'Inter',sans-serif;--display:'DM Sans',sans-serif;
   }
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:100vh;overflow-x:hidden}
-  body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.07) 2px,rgba(0,0,0,.07) 4px);pointer-events:none;z-index:9999}
+  body{background:var(--bg);color:var(--text);font-family:var(--body);min-height:100vh;overflow-x:hidden;font-size:14px;line-height:1.5}
 
   /* header */
-  #header{border-bottom:1px solid var(--border2);padding:18px 32px;display:flex;align-items:center;justify-content:space-between;background:#0d0d0d}
-  .logo{font-family:var(--sans);font-weight:900;font-size:28px;letter-spacing:6px;color:var(--amber);text-transform:uppercase}
-  .logo span{color:var(--muted);font-weight:300}
-  .status{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:8px}
+  #header{border-bottom:1px solid var(--border);padding:16px 32px;display:flex;align-items:center;justify-content:space-between;background:var(--surface)}
+  .logo{font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:1px;color:var(--amber)}
+  .logo span{color:var(--muted);font-weight:400}
+  .status{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:8px}
   .dot{width:7px;height:7px;border-radius:50%;background:var(--red);animation:pulse 2s infinite}
   .dot.unlocked{background:var(--green)}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
   /* lockscreen */
-  #lockscreen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 65px);padding:40px}
-  .lock-icon{font-size:64px;margin-bottom:24px;filter:drop-shadow(0 0 20px rgba(245,166,35,.3));animation:float 3s ease-in-out infinite}
-  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
-  #lockscreen h2{font-family:var(--sans);font-weight:700;font-size:22px;letter-spacing:3px;text-transform:uppercase;color:var(--amber);margin-bottom:8px}
-  #lockscreen p{color:var(--muted);font-size:12px;margin-bottom:28px;text-align:center;line-height:1.8;max-width:420px}
-  .lock-form{display:flex;flex-direction:column;gap:10px;width:100%;max-width:360px}
-  .lock-form input{background:var(--surface);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:14px;padding:12px 16px;outline:none;transition:border-color .2s;width:100%}
+  #lockscreen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 57px);padding:40px}
+  .lock-icon{font-size:56px;margin-bottom:20px;animation:float 3s ease-in-out infinite}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+  #lockscreen h2{font-family:var(--display);font-weight:700;font-size:24px;color:var(--text);margin-bottom:8px;text-align:center}
+  #lockscreen p{color:var(--muted);font-size:13px;margin-bottom:28px;text-align:center;line-height:1.7;max-width:400px}
+  .lock-form{display:flex;flex-direction:column;gap:10px;width:100%;max-width:340px}
+  .lock-form input{background:var(--surface);border:1px solid var(--border2);color:var(--text);font-family:var(--body);font-size:14px;padding:11px 14px;outline:none;transition:border-color .2s;width:100%;border-radius:6px}
   .lock-form input:focus{border-color:var(--amber)}
   .lock-form input::placeholder{color:var(--muted)}
 
   /* vault picker */
   .vault-picker{display:flex;flex-direction:column;gap:6px;width:100%;margin-bottom:4px}
-  .vault-pick-btn{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border2);padding:10px 14px;cursor:pointer;transition:border-color .15s;width:100%;text-align:left}
-  .vault-pick-btn:hover{border-color:var(--border2)}
+  .vault-pick-btn{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border2);padding:10px 14px;cursor:pointer;transition:border-color .15s;width:100%;text-align:left;border-radius:6px}
+  .vault-pick-btn:hover{border-color:var(--muted)}
   .vault-pick-btn.active{border-color:var(--amber)}
-  .vault-pick-name{font-family:var(--sans);font-weight:700;font-size:14px;letter-spacing:1px;color:var(--text)}
-  .vault-pick-meta{font-size:10px;color:var(--muted)}
-  .vault-pick-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:2px 6px;line-height:1;transition:color .15s}
+  .vault-pick-name{font-family:var(--display);font-weight:600;font-size:14px;color:var(--text)}
+  .vault-pick-meta{font-size:11px;color:var(--muted);margin-top:2px}
+  .vault-pick-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:2px 6px;line-height:1;transition:color .15s;border-radius:4px}
   .vault-pick-del:hover{color:var(--red)}
-  .vault-divider{font-size:10px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;text-align:center;padding:4px 0;border-top:1px solid var(--border)}
+  .vault-divider{font-size:11px;color:var(--muted);text-align:center;padding:4px 0;border-top:1px solid var(--border);margin-top:2px}
 
   /* buttons */
-  .btn{font-family:var(--sans);font-weight:700;font-size:15px;letter-spacing:2px;text-transform:uppercase;padding:12px 24px;border:none;cursor:pointer;transition:all .15s;outline:none}
+  .btn{font-family:var(--display);font-weight:600;font-size:14px;letter-spacing:0;text-transform:none;padding:10px 20px;border:none;cursor:pointer;transition:all .15s;outline:none;border-radius:6px}
   .btn-primary{background:var(--amber);color:#000}
   .btn-primary:hover{background:var(--amber2)}
   .btn-primary:disabled{opacity:.5;cursor:not-allowed}
@@ -57,8 +56,8 @@
   .btn-danger:hover{opacity:.85}
   .btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border2)}
   .btn-ghost:hover{color:var(--text);background:var(--surface)}
-  .btn-sm{font-size:11px;padding:6px 14px}
-  .btn-icon{background:transparent;border:none;cursor:pointer;padding:6px;color:var(--muted);font-size:16px;transition:color .15s;line-height:1}
+  .btn-sm{font-size:12px;padding:6px 12px}
+  .btn-icon{background:transparent;border:none;cursor:pointer;padding:6px;color:var(--muted);font-size:15px;transition:color .15s;line-height:1;border-radius:4px}
   .btn-icon:hover{color:var(--text)}
   .btn-icon.red:hover{color:var(--red)}
   .btn-full{width:100%}
@@ -67,83 +66,83 @@
   #lock-msg.err{color:var(--red)}
   #lock-msg.info{color:var(--muted)}
   .reset-all-link{text-align:center;margin-top:2px}
-  .reset-all-link button{background:none;border:none;color:var(--muted);font-family:var(--mono);font-size:10px;cursor:pointer;text-decoration:underline;padding:0;letter-spacing:.5px}
+  .reset-all-link button{background:none;border:none;color:var(--muted);font-family:var(--body);font-size:11px;cursor:pointer;text-decoration:underline;padding:0}
   .reset-all-link button:hover{color:var(--red)}
 
   /* app */
   #app{display:none}
   #app.visible{display:block}
-  #topbar{padding:12px 32px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:#0c0c0c;flex-wrap:wrap}
-  .tab-btn{font-family:var(--sans);font-weight:700;font-size:13px;letter-spacing:2px;text-transform:uppercase;padding:8px 20px;background:transparent;border:1px solid transparent;color:var(--muted);cursor:pointer;transition:all .15s}
-  .tab-btn.active{color:var(--amber);border-color:var(--amber)}
-  .tab-btn:hover:not(.active){color:var(--text);border-color:var(--border2)}
+  #topbar{padding:10px 32px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;background:var(--surface);flex-wrap:wrap}
+  .tab-btn{font-family:var(--display);font-weight:500;font-size:13px;letter-spacing:0;text-transform:none;padding:7px 16px;background:transparent;border:1px solid transparent;color:var(--muted);cursor:pointer;transition:all .15s;border-radius:6px}
+  .tab-btn.active{color:var(--amber);border-color:rgba(245,166,35,.3);background:rgba(245,166,35,.07)}
+  .tab-btn:hover:not(.active){color:var(--text);background:rgba(255,255,255,.05)}
   #topbar .spacer{flex:1}
-  .topbar-btn{font-family:var(--sans);font-weight:600;font-size:12px;letter-spacing:1px;text-transform:uppercase;padding:7px 14px;background:transparent;border:1px solid var(--border2);color:var(--muted);cursor:pointer;transition:all .15s}
-  #lock-btn:hover{color:var(--red);border-color:var(--red)}
-  #share-btn:hover{color:var(--amber);border-color:var(--amber)}
-  #settings-btn:hover{color:var(--blue);border-color:var(--blue)}
-  .vault-name-badge{font-family:var(--sans);font-size:11px;color:var(--muted);letter-spacing:1px;border-left:1px solid var(--border);padding-left:12px}
+  .topbar-btn{font-family:var(--display);font-weight:500;font-size:12px;letter-spacing:0;text-transform:none;padding:6px 12px;background:transparent;border:1px solid var(--border2);color:var(--muted);cursor:pointer;transition:all .15s;border-radius:6px}
+  #lock-btn:hover{color:var(--red);border-color:rgba(224,82,82,.4)}
+  #share-btn:hover{color:var(--amber);border-color:rgba(245,166,35,.4)}
+  #settings-btn:hover{color:var(--text);border-color:var(--border2)}
+  .vault-name-badge{font-family:var(--display);font-size:12px;color:var(--muted);border-left:1px solid var(--border);padding-left:12px}
 
   /* content */
   #content{padding:28px 32px;max-width:1000px}
   .tab-panel{display:none}
   .tab-panel.active{display:block}
   .sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
-  .sec-header h3{font-family:var(--sans);font-weight:700;font-size:18px;letter-spacing:3px;text-transform:uppercase;color:var(--amber)}
-  .count{font-size:11px;color:var(--muted);margin-left:10px}
+  .sec-header h3{font-family:var(--display);font-weight:600;font-size:16px;color:var(--text)}
+  .count{font-size:11px;color:var(--muted);margin-left:8px}
 
   /* cards */
-  .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
-  .entry-card{background:var(--surface);border:1px solid var(--border);padding:18px;position:relative;transition:border-color .2s}
+  .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+  .entry-card{background:var(--surface);border:1px solid var(--border);padding:18px;position:relative;transition:border-color .2s;border-radius:8px}
   .entry-card:hover{border-color:var(--border2)}
-  .card-label{font-family:var(--sans);font-size:17px;font-weight:700;letter-spacing:1px;color:var(--text);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:60px}
+  .card-label{font-family:var(--display);font-size:16px;font-weight:600;color:var(--text);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:60px}
   .card-sub{font-size:11px;color:var(--muted);margin-bottom:14px}
-  .card-actions{position:absolute;top:12px;right:12px;display:flex;gap:4px}
-  .totp-code{font-size:32px;letter-spacing:6px;color:var(--amber);line-height:1;transition:color .3s;cursor:pointer;user-select:all}
+  .card-actions{position:absolute;top:12px;right:12px;display:flex;gap:2px}
+  .totp-code{font-size:30px;letter-spacing:4px;color:var(--amber);line-height:1;transition:color .3s;cursor:pointer;user-select:all;font-family:var(--display);font-weight:600}
   .totp-code.warn{color:var(--red)}
   .totp-code.copy-flash{color:var(--green)}
-  .totp-bar-wrap{margin-top:10px;height:2px;background:var(--border);overflow:hidden}
+  .totp-bar-wrap{margin-top:10px;height:2px;background:var(--border);overflow:hidden;border-radius:1px}
   .totp-bar{height:100%;background:var(--amber);transition:width .9s linear,background .3s}
   .totp-bar.warn{background:var(--red)}
   .totp-remaining{font-size:10px;color:var(--muted);margin-top:4px;text-align:right}
   .note-locked{color:var(--muted);font-size:12px}
-  .note-body{background:var(--bg);border:1px solid var(--border);padding:14px;font-size:13px;line-height:1.7;white-space:pre-wrap;word-break:break-word;max-height:300px;overflow-y:auto;color:var(--text)}
+  .note-body{background:var(--bg);border:1px solid var(--border);padding:14px;font-size:13px;line-height:1.7;white-space:pre-wrap;word-break:break-word;max-height:300px;overflow-y:auto;color:var(--text);border-radius:4px}
 
   /* modal */
-  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:1000;align-items:center;justify-content:center;padding:20px}
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:1000;align-items:center;justify-content:center;padding:20px}
   .modal-overlay.open{display:flex}
-  .modal{background:var(--surface);border:1px solid var(--border2);padding:28px;width:100%;max-width:460px;position:relative;animation:slide-up .2s ease}
-  @keyframes slide-up{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}
-  .modal h3{font-family:var(--sans);font-weight:700;font-size:20px;letter-spacing:2px;text-transform:uppercase;color:var(--amber);margin-bottom:20px}
-  .modal-close{position:absolute;top:16px;right:16px;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;transition:color .15s}
-  .modal-close:hover{color:var(--text)}
+  .modal{background:var(--surface);border:1px solid var(--border2);padding:28px;width:100%;max-width:460px;position:relative;animation:slide-up .2s ease;border-radius:10px}
+  @keyframes slide-up{from{transform:translateY(10px);opacity:0}to{transform:none;opacity:1}}
+  .modal h3{font-family:var(--display);font-weight:700;font-size:18px;color:var(--text);margin-bottom:18px}
+  .modal-close{position:absolute;top:14px;right:14px;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;line-height:1;transition:color .15s;border-radius:4px;padding:2px 6px}
+  .modal-close:hover{color:var(--text);background:rgba(255,255,255,.08)}
   .modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
 
   /* forms */
   .form-row{margin-bottom:14px}
-  .form-row label{display:block;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
-  .form-row input,.form-row textarea{width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);font-family:var(--mono);font-size:13px;padding:10px 14px;outline:none;transition:border-color .2s;resize:vertical}
+  .form-row label{display:block;font-size:11px;font-weight:500;color:var(--muted);margin-bottom:5px;text-transform:none;letter-spacing:0}
+  .form-row input,.form-row textarea{width:100%;background:var(--bg);border:1px solid var(--border2);color:var(--text);font-family:var(--body);font-size:13px;padding:10px 12px;outline:none;transition:border-color .2s;resize:vertical;border-radius:6px}
   .form-row input:focus,.form-row textarea:focus{border-color:var(--amber)}
   .form-row input::placeholder,.form-row textarea::placeholder{color:var(--muted)}
-  .form-err{color:var(--red);font-size:11px;margin-top:6px;display:none}
+  .form-err{color:var(--red);font-size:12px;margin-top:5px;display:none}
   .form-err.show{display:block}
 
   /* method picker */
-  .method-btn{display:flex;align-items:flex-start;gap:14px;background:var(--bg);border:1px solid var(--border2);padding:14px;cursor:pointer;text-align:left;transition:border-color .15s;width:100%}
+  .method-btn{display:flex;align-items:flex-start;gap:14px;background:var(--bg);border:1px solid var(--border2);padding:14px;cursor:pointer;text-align:left;transition:border-color .15s;width:100%;border-radius:8px}
   .method-btn:hover,.method-btn.selected{border-color:var(--amber)}
   .method-btn.selected{background:rgba(245,166,35,.05)}
-  .method-icon{font-size:22px;line-height:1;flex-shrink:0;margin-top:2px}
-  .method-title{font-family:var(--sans);font-weight:700;font-size:15px;letter-spacing:1px;color:var(--text);margin-bottom:3px}
+  .method-icon{font-size:20px;line-height:1;flex-shrink:0;margin-top:2px}
+  .method-title{font-family:var(--display);font-weight:600;font-size:14px;color:var(--text);margin-bottom:3px}
   .method-desc{font-size:11px;color:var(--muted);line-height:1.5}
-  .strength-bar{height:2px;background:var(--border);margin-top:6px}
-  .strength-fill{height:100%;transition:width .3s,background .3s;width:0%;background:var(--red)}
+  .strength-bar{height:3px;background:var(--border);margin-top:6px;border-radius:2px}
+  .strength-fill{height:100%;transition:width .3s,background .3s;width:0%;background:var(--red);border-radius:2px}
 
   /* badge */
-  .badge{display:inline-block;font-size:9px;letter-spacing:1px;text-transform:uppercase;padding:2px 6px;border:1px solid var(--border2);color:var(--muted);margin-bottom:6px}
-  .badge.totp{border-color:rgba(245,166,35,.4);color:var(--amber)}
-  .badge.note{border-color:rgba(74,158,255,.4);color:var(--blue)}
-  .badge.locked{border-color:rgba(224,82,82,.3);color:var(--red)}
-  .empty{color:var(--muted);font-size:13px;padding:40px 0;text-align:center;border:1px dashed var(--border);grid-column:1/-1}
+  .badge{display:inline-block;font-size:10px;font-weight:500;padding:2px 7px;border-radius:4px;margin-bottom:6px;letter-spacing:0}
+  .badge.totp{background:rgba(245,166,35,.15);color:var(--amber)}
+  .badge.note{background:rgba(74,158,255,.15);color:var(--blue)}
+  .badge.locked{background:rgba(224,82,82,.15);color:var(--red)}
+  .empty{color:var(--muted);font-size:13px;padding:40px 0;text-align:center;border:1px dashed var(--border);grid-column:1/-1;border-radius:8px}
   .empty span{color:var(--amber)}
 
   #toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface);border:1px solid var(--border2);color:var(--text);font-size:12px;padding:10px 20px;letter-spacing:1px;opacity:0;transition:all .25s;pointer-events:none;z-index:9000;white-space:nowrap}
@@ -158,15 +157,15 @@
   <div class="logo">V<span>ault</span></div>
   <div class="status">
     <div class="dot" id="status-dot"></div>
-    <span id="status-text">LOCKED</span>
+    <span id="status-text">Locked</span>
   </div>
 </div>
 
 <!-- ══ LOCK SCREEN ══ -->
 <div id="lockscreen">
   <div class="lock-icon">🔐</div>
-  <h2 id="lock-title">Your Vaults</h2>
-  <p id="lock-desc">Everything is fully encrypted and stored only on your device. Your password is never saved anywhere — with a strong password it would take longer than the age of the universe to crack.</p>
+  <h2 id="lock-title">Welcome back</h2>
+  <p id="lock-desc">Everything is encrypted and only stored on your device. Your password is never saved anywhere.</p>
   <div class="lock-form">
     <div id="vault-picker-wrap" class="vault-picker"></div>
     <div id="unlock-section">
@@ -176,12 +175,12 @@
         readonly onfocus="this.removeAttribute('readonly')"
         onkeydown="if(event.key==='Enter')unlock()">
       <div id="lock-msg" style="margin-top:4px"></div>
-      <button class="btn btn-primary btn-full" id="unlock-btn" onclick="unlock()" style="margin-top:6px">OPEN MY VAULT</button>
-      <button class="btn btn-ghost btn-full" id="passkey-btn" onclick="unlockWithPasskey()" style="display:none;margin-top:6px">🪪 USE PASSKEY INSTEAD</button>
+      <button class="btn btn-primary btn-full" id="unlock-btn" onclick="unlock()" style="margin-top:6px">Open my vault</button>
+      <button class="btn btn-ghost btn-full" id="passkey-btn" onclick="unlockWithPasskey()" style="display:none;margin-top:6px">🪪 Use passkey instead</button>
     </div>
-    <div class="vault-divider" id="vault-divider" style="display:none">OR</div>
-    <button class="btn btn-ghost btn-full" onclick="openModal('create-vault')">CREATE VAULT</button>
-    <div class="reset-all-link"><button onclick="confirmResetAll()">reset & delete all vault data</button></div>
+    <div class="vault-divider" id="vault-divider" style="display:none">or</div>
+    <button class="btn btn-ghost btn-full" onclick="openModal('create-vault')">Create a vault</button>
+    <div class="reset-all-link"><button onclick="confirmResetAll()">delete all vault data</button></div>
   </div>
 </div>
 
@@ -189,25 +188,25 @@
 <div id="app">
   <div id="topbar">
     <button class="tab-btn active" onclick="switchTab('totp',this)">⏱ Login Codes</button>
-    <button class="tab-btn" onclick="switchTab('notes',this)">📝 Private Notes</button>
+    <button class="tab-btn" onclick="switchTab('notes',this)">📝 Notes</button>
     <div class="spacer"></div>
     <span class="vault-name-badge" id="active-vault-name"></span>
-    <button class="topbar-btn" id="settings-btn" onclick="openVaultSettings()">⚙ SETTINGS</button>
-    <button class="topbar-btn" id="share-btn" onclick="openShareModal()">🔗 SHARE LINK</button>
-    <button class="topbar-btn" id="lock-btn" onclick="lockVault()">🔒 LOCK</button>
+    <button class="topbar-btn" id="settings-btn" onclick="openVaultSettings()">⚙ Settings</button>
+    <button class="topbar-btn" id="share-btn" onclick="openShareModal()">🔗 Share</button>
+    <button class="topbar-btn" id="lock-btn" onclick="lockVault()">🔒 Lock</button>
   </div>
   <div id="content">
     <div id="tab-totp" class="tab-panel active">
       <div class="sec-header">
         <h3>Login Codes <span class="count" id="totp-count"></span></h3>
-        <button class="btn btn-primary btn-sm" onclick="openModal('add-totp')">+ ADD CODE</button>
+        <button class="btn btn-primary btn-sm" onclick="openModal('add-totp')">+ Add code</button>
       </div>
       <div class="card-grid" id="totp-list"></div>
     </div>
     <div id="tab-notes" class="tab-panel">
       <div class="sec-header">
-        <h3>Private Notes <span class="count" id="notes-count"></span></h3>
-        <button class="btn btn-primary btn-sm" onclick="openModal('add-note')">+ ADD NOTE</button>
+        <h3>Notes <span class="count" id="notes-count"></span></h3>
+        <button class="btn btn-primary btn-sm" onclick="openModal('add-note')">+ Add note</button>
       </div>
       <div class="card-grid" id="notes-list"></div>
     </div>
@@ -220,55 +219,55 @@
 <div class="modal-overlay" id="modal-create-vault">
   <div class="modal" style="max-width:500px">
     <button class="modal-close" onclick="closeModal('create-vault');cvReset()">✕</button>
-    <h3>Create Vault</h3>
+    <h3>New Vault</h3>
     <div id="cv-step-pick">
       <div class="form-row">
-        <label>Vault Name</label>
+        <label>Give it a name</label>
         <input type="text" id="cv-name" placeholder="e.g. Personal, Work…" autocomplete="off">
       </div>
       <p style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.7">How do you want to unlock it?</p>
       <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:4px">
         <button class="method-btn" id="mb-pw"   onclick="pickMethod('password')">
           <div class="method-icon">🔑</div>
-          <div><div class="method-title">Password</div><div class="method-desc">Type a password to unlock. Supports share links to transfer to other devices.</div></div>
+          <div><div class="method-title">Password</div><div class="method-desc">Type a password to unlock. Lets you transfer it to other devices via a link.</div></div>
         </button>
         <button class="method-btn" id="mb-pk"   onclick="pickMethod('passkey')">
           <div class="method-icon">🪪</div>
-          <div><div class="method-title">Passkey only</div><div class="method-desc">Use fingerprint, Face ID, or device PIN. This device only — no share link.</div></div>
+          <div><div class="method-title">Passkey (fingerprint / Face ID)</div><div class="method-desc">Use your device's biometrics or PIN. Works on this device only.</div></div>
         </button>
         <button class="method-btn" id="mb-both" onclick="pickMethod('both')">
           <div class="method-icon">🛡</div>
-          <div><div class="method-title">Both</div><div class="method-desc">Passkey for quick unlock on this device, plus a password for share links.</div></div>
+          <div><div class="method-title">Both</div><div class="method-desc">Quick biometric unlock on this device, plus a password for sharing.</div></div>
         </button>
       </div>
     </div>
     <div id="cv-step-pw" style="display:none">
       <div class="form-row">
-        <label>Your Password</label>
+        <label>Choose a password</label>
         <input type="password" id="new-pw" placeholder="At least 12 characters…"
           autocomplete="off" data-lpignore="true" data-form-type="other"
           readonly onfocus="this.removeAttribute('readonly')">
         <div class="strength-bar"><div class="strength-fill" id="pw-strength-fill"></div></div>
-        <div style="font-size:10px;color:var(--muted);margin-top:4px" id="pw-strength-label"></div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px" id="pw-strength-label"></div>
       </div>
       <div class="form-row">
-        <label>Confirm Password</label>
-        <input type="password" id="new-pw2" placeholder="Repeat password…"
+        <label>Type it again to confirm</label>
+        <input type="password" id="new-pw2" placeholder="Repeat your password…"
           autocomplete="off" data-lpignore="true" data-form-type="other"
           readonly onfocus="this.removeAttribute('readonly')">
       </div>
     </div>
     <div id="cv-step-pk" style="display:none">
       <p style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.7" id="pk-info-text">
-        Click Create and your browser will ask you to confirm with your fingerprint, Face ID, or PIN.
+        Your device will ask you to confirm with your fingerprint, Face ID, or PIN.
       </p>
       <div id="pk-status" style="font-size:12px;color:var(--muted);min-height:18px"></div>
     </div>
     <div class="form-err" id="create-err"></div>
     <div class="modal-footer">
-      <button class="btn btn-ghost" id="cv-back-btn" onclick="cvBack()" style="display:none">BACK</button>
-      <button class="btn btn-ghost" onclick="closeModal('create-vault');cvReset()">CANCEL</button>
-      <button class="btn btn-primary" id="create-btn" onclick="createVault()" style="display:none">CREATE VAULT</button>
+      <button class="btn btn-ghost" id="cv-back-btn" onclick="cvBack()" style="display:none">Back</button>
+      <button class="btn btn-ghost" onclick="closeModal('create-vault');cvReset()">Cancel</button>
+      <button class="btn btn-primary" id="create-btn" onclick="createVault()" style="display:none">Create vault</button>
     </div>
   </div>
 </div>
@@ -277,21 +276,21 @@
 <div class="modal-overlay" id="modal-add-totp">
   <div class="modal">
     <button class="modal-close" onclick="closeModal('add-totp')">✕</button>
-    <h3>Add a Login Code</h3>
+    <h3>Add a login code</h3>
     <div class="form-row">
-      <label>Name (which account is this?)</label>
+      <label>Name — which account is this?</label>
       <input type="text" id="totp-label" placeholder="e.g. GitHub – username" autocomplete="off">
     </div>
     <div class="form-row">
-      <label>Secret Key — shown when you set up 2FA</label>
-      <input type="text" id="totp-secret" placeholder="JBSWY3DPEHPK3PXP…" autocomplete="off" spellcheck="false" style="letter-spacing:2px">
+      <label>Setup key — the code shown when you enable 2-step verification</label>
+      <input type="text" id="totp-secret" placeholder="e.g. JBSWY3DPEHPK3PXP" autocomplete="off" spellcheck="false" style="letter-spacing:2px">
     </div>
     <div class="form-row">
-      <label>Website or App (optional)</label>
+      <label>Website or app (optional)</label>
       <input type="text" id="totp-issuer" placeholder="e.g. GitHub" autocomplete="off">
     </div>
     <div class="form-row">
-      <label>Code refreshes every ___ seconds (usually 30)</label>
+      <label>Code refreshes every ___ seconds (leave at 30 unless told otherwise)</label>
       <input type="number" id="totp-period" value="30" min="15" max="120">
     </div>
     <div class="form-row">
@@ -300,8 +299,8 @@
     </div>
     <div class="form-err" id="add-totp-err"></div>
     <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('add-totp')">CANCEL</button>
-      <button class="btn btn-primary" onclick="addTOTP()">SAVE</button>
+      <button class="btn btn-ghost" onclick="closeModal('add-totp')">Cancel</button>
+      <button class="btn btn-primary" onclick="addTOTP()">Save</button>
     </div>
   </div>
 </div>
@@ -310,25 +309,25 @@
 <div class="modal-overlay" id="modal-add-note">
   <div class="modal">
     <button class="modal-close" onclick="closeModal('add-note')">✕</button>
-    <h3>Add a Private Note</h3>
+    <h3>Add a note</h3>
     <div class="form-row">
       <label>Title</label>
       <input type="text" id="note-title" placeholder="e.g. Recovery codes, SSH key…" autocomplete="off">
     </div>
     <div class="form-row">
-      <label>Your Note</label>
-      <textarea id="note-body" rows="5" placeholder="Type anything here — it'll be encrypted…" autocomplete="off"></textarea>
+      <label>Note</label>
+      <textarea id="note-body" rows="5" placeholder="Type anything here…" autocomplete="off"></textarea>
     </div>
     <div class="form-row">
-      <label>Extra Password (optional) — adds a second lock to this note only</label>
+      <label>Extra password (optional) — adds a second lock to just this note</label>
       <input type="password" id="note-extra-pw" placeholder="Leave blank to use your main password"
         autocomplete="off" data-lpignore="true" data-form-type="other"
         readonly onfocus="this.removeAttribute('readonly')">
     </div>
     <div class="form-err" id="add-note-err"></div>
     <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('add-note')">CANCEL</button>
-      <button class="btn btn-primary" onclick="addNote()">SAVE</button>
+      <button class="btn btn-ghost" onclick="closeModal('add-note')">Cancel</button>
+      <button class="btn btn-primary" onclick="addNote()">Save</button>
     </div>
   </div>
 </div>
@@ -339,24 +338,24 @@
     <button class="modal-close" onclick="closeModal('view-note');wipeNoteView()">✕</button>
     <h3 id="view-note-title">Note</h3>
     <div id="view-note-pw-section">
-      <p style="font-size:12px;color:var(--muted);margin-bottom:12px">This note has a second password. Enter it to read it.</p>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:12px">This note has a second password. Enter it to read it.</p>
       <div class="form-row">
-        <label>Second Password</label>
+        <label>Second password</label>
         <input type="password" id="view-note-pw" placeholder="Enter the extra password…"
           autocomplete="off" data-lpignore="true" data-form-type="other"
           readonly onfocus="this.removeAttribute('readonly')">
       </div>
       <div class="form-err" id="view-note-err"></div>
       <div class="modal-footer" style="margin-top:12px">
-        <button class="btn btn-ghost" onclick="closeModal('view-note')">CANCEL</button>
-        <button class="btn btn-primary" onclick="decryptAndShowNote()">OPEN NOTE</button>
+        <button class="btn btn-ghost" onclick="closeModal('view-note')">Cancel</button>
+        <button class="btn btn-primary" onclick="decryptAndShowNote()">Open note</button>
       </div>
     </div>
     <div id="view-note-body-section" style="display:none">
       <div class="note-body" id="view-note-body"></div>
       <div class="modal-footer">
-        <button class="btn btn-ghost" onclick="closeModal('view-note');wipeNoteView()">CLOSE</button>
-        <button class="btn btn-sm btn-ghost" onclick="copyNoteContent()">⎘ COPY</button>
+        <button class="btn btn-ghost" onclick="closeModal('view-note');wipeNoteView()">Close</button>
+        <button class="btn btn-sm btn-ghost" onclick="copyNoteContent()">Copy</button>
       </div>
     </div>
   </div>
@@ -365,11 +364,11 @@
 <!-- Confirm delete entry -->
 <div class="modal-overlay" id="modal-confirm-delete">
   <div class="modal">
-    <h3>Are You Sure?</h3>
-    <p style="font-size:13px;color:var(--muted);margin-bottom:20px">This will delete the entry forever. You can't undo this.</p>
+    <h3>Delete this?</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:20px">This can't be undone.</p>
     <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('confirm-delete')">CANCEL</button>
-      <button class="btn btn-danger" id="confirm-delete-btn">DELETE</button>
+      <button class="btn btn-ghost" onclick="closeModal('confirm-delete')">Keep it</button>
+      <button class="btn btn-danger" id="confirm-delete-btn">Delete</button>
     </div>
   </div>
 </div>
@@ -378,22 +377,20 @@
 <div class="modal-overlay" id="modal-share-link">
   <div class="modal">
     <button class="modal-close" onclick="closeModal('share-link')">✕</button>
-    <h3>Share / Transfer Vault</h3>
-    <p style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.7">
-      This link contains your <strong style="color:var(--text)">fully encrypted</strong> vault.
-      Anyone who opens it still needs your password — without it the data is unreadable.
-      The link never touches any server.
+    <h3>Transfer to another device</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.7">
+      Copy this link and open it on your other device. Your password is still required to open it — the link alone is useless without it.
     </p>
     <div class="form-row">
-      <label>Your Vault Link — click to select all</label>
+      <label>Your link — click to select all</label>
       <div id="share-url"
-        style="font-size:11px;word-break:break-all;cursor:text;background:var(--bg);border:1px solid var(--border2);padding:10px 14px;line-height:1.7;min-height:80px;color:var(--text);user-select:all"
+        style="font-size:11px;word-break:break-all;cursor:text;background:var(--bg);border:1px solid var(--border2);padding:10px 12px;line-height:1.7;min-height:72px;color:var(--text);user-select:all;border-radius:6px"
         onclick="selectShareUrl()"></div>
     </div>
-    <div style="font-size:10px;color:var(--muted);margin-bottom:4px">⚠ Only share this with yourself — it contains your encrypted data.</div>
+    <p style="font-size:11px;color:var(--muted);margin-bottom:4px">Only send this to yourself — it contains your private encrypted data.</p>
     <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('share-link')">CLOSE</button>
-      <button class="btn btn-primary" onclick="copyShareLink()">⎘ COPY LINK</button>
+      <button class="btn btn-ghost" onclick="closeModal('share-link')">Close</button>
+      <button class="btn btn-primary" onclick="copyShareLink()">Copy link</button>
     </div>
   </div>
 </div>
@@ -405,22 +402,22 @@
     <h3>Vault Settings</h3>
 
     <div class="form-row">
-      <label>Vault Name</label>
+      <label>Name</label>
       <input type="text" id="settings-name" placeholder="e.g. Personal, Work…" autocomplete="off">
     </div>
 
     <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px">
-      <button class="btn btn-ghost btn-full" onclick="openCredentialChange()">🔑 CHANGE UNLOCK METHOD</button>
+      <button class="btn btn-ghost btn-full" onclick="openCredentialChange()">🔑 Change how you unlock this vault</button>
     </div>
 
     <div style="border-top:1px solid var(--border);padding-top:14px">
-      <p style="font-size:11px;color:var(--muted);margin-bottom:10px;letter-spacing:.5px">DANGER ZONE</p>
-      <button class="btn btn-danger btn-full" onclick="confirmDeleteCurrentVault()">🗑 DELETE THIS VAULT</button>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:10px">Danger zone</p>
+      <button class="btn btn-danger btn-full" onclick="confirmDeleteCurrentVault()">Delete this vault</button>
     </div>
 
     <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('vault-settings')">CLOSE</button>
-      <button class="btn btn-primary" onclick="saveVaultSettings()">SAVE NAME</button>
+      <button class="btn btn-ghost" onclick="closeModal('vault-settings')">Close</button>
+      <button class="btn btn-primary" onclick="saveVaultSettings()">Save name</button>
     </div>
   </div>
 </div>
@@ -429,15 +426,15 @@
 <div class="modal-overlay" id="modal-change-credential">
   <div class="modal" style="max-width:500px">
     <button class="modal-close" onclick="closeModal('change-credential');resetCredFlow()">✕</button>
-    <h3 id="cred-modal-title">Change Unlock Method</h3>
+    <h3 id="cred-modal-title">Change how you unlock</h3>
 
     <!-- Step 1: verify identity -->
     <div id="cred-step-verify">
-      <p style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.7" id="cred-verify-hint">
-        Verify your identity first before changing how you unlock this vault.
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.7" id="cred-verify-hint">
+        First, confirm it's you by entering your current password.
       </p>
       <div id="cred-verify-pw-row" class="form-row">
-        <label>Current Password</label>
+        <label>Current password</label>
         <input type="password" id="cred-verify-pw" placeholder="Your current password…"
           autocomplete="off" data-lpignore="true" data-form-type="other"
           readonly onfocus="this.removeAttribute('readonly')"
@@ -445,28 +442,28 @@
       </div>
       <div class="form-err" id="cred-verify-err"></div>
       <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
-        <button class="btn btn-primary btn-full" id="cred-verify-pw-btn" onclick="verifyCurrentCredential('password')">VERIFY PASSWORD</button>
-        <button class="btn btn-ghost btn-full" id="cred-verify-pk-btn" onclick="verifyCurrentCredential('passkey')" style="display:none">🪪 VERIFY WITH PASSKEY INSTEAD</button>
+        <button class="btn btn-primary btn-full" id="cred-verify-pw-btn" onclick="verifyCurrentCredential('password')">Confirm password</button>
+        <button class="btn btn-ghost btn-full" id="cred-verify-pk-btn" onclick="verifyCurrentCredential('passkey')" style="display:none">🪪 Use passkey instead</button>
       </div>
     </div>
 
-    <!-- Step 2: pick new method (mirrors create vault cards) -->
+    <!-- Step 2: pick new method -->
     <div id="cred-step-pick" style="display:none">
-      <p style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.7">
-        ✓ Verified. Choose your new unlock method:
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.7">
+        ✓ Confirmed. Now choose how you want to unlock this vault:
       </p>
       <div style="display:flex;flex-direction:column;gap:10px">
         <button class="method-btn" id="cred-mb-pw" onclick="pickCredMethod('password')">
           <div class="method-icon">🔑</div>
-          <div><div class="method-title">Password</div><div class="method-desc">Type a password to unlock. Supports share links to transfer to other devices.</div></div>
+          <div><div class="method-title">Password</div><div class="method-desc">Type a password to unlock. Lets you transfer to other devices via a link.</div></div>
         </button>
         <button class="method-btn" id="cred-mb-pk" onclick="pickCredMethod('passkey')">
           <div class="method-icon">🪪</div>
-          <div><div class="method-title">Passkey only</div><div class="method-desc">Use fingerprint, Face ID, or device PIN. This device only — no share link.</div></div>
+          <div><div class="method-title">Passkey (fingerprint / Face ID)</div><div class="method-desc">Use your device's biometrics or PIN. Works on this device only.</div></div>
         </button>
         <button class="method-btn" id="cred-mb-both" onclick="pickCredMethod('both')">
           <div class="method-icon">🛡</div>
-          <div><div class="method-title">Both</div><div class="method-desc">Passkey for quick unlock on this device, plus a password for share links.</div></div>
+          <div><div class="method-title">Both</div><div class="method-desc">Quick biometric unlock on this device, plus a password for sharing.</div></div>
         </button>
       </div>
     </div>
@@ -474,16 +471,16 @@
     <!-- Step 3: password fields -->
     <div id="cred-step-pw" style="display:none">
       <div class="form-row" style="margin-top:14px">
-        <label>New Password</label>
+        <label>New password</label>
         <input type="password" id="cred-new-pw" placeholder="At least 12 characters…"
           autocomplete="off" data-lpignore="true" data-form-type="other"
           readonly onfocus="this.removeAttribute('readonly')">
         <div class="strength-bar"><div class="strength-fill" id="cred-strength-fill"></div></div>
-        <div style="font-size:10px;color:var(--muted);margin-top:4px" id="cred-strength-label"></div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px" id="cred-strength-label"></div>
       </div>
       <div class="form-row">
-        <label>Confirm New Password</label>
-        <input type="password" id="cred-confirm-pw" placeholder="Type new password again…"
+        <label>Type it again to confirm</label>
+        <input type="password" id="cred-confirm-pw" placeholder="Repeat your new password…"
           autocomplete="off" data-lpignore="true" data-form-type="other"
           readonly onfocus="this.removeAttribute('readonly')">
       </div>
@@ -491,8 +488,8 @@
 
     <!-- Step 3b: passkey info -->
     <div id="cred-step-pk" style="display:none">
-      <p style="font-size:12px;color:var(--muted);margin-top:14px;line-height:1.7" id="cred-pk-info-text">
-        Click Apply and your browser will ask you to set up a passkey.
+      <p style="font-size:13px;color:var(--muted);margin-top:14px;line-height:1.7" id="cred-pk-info-text">
+        Your device will ask you to set up a passkey when you click Apply.
       </p>
       <div style="font-size:12px;color:var(--muted);min-height:18px" id="cred-pk-status"></div>
     </div>
@@ -500,9 +497,9 @@
     <div class="form-err" id="cred-apply-err"></div>
 
     <div class="modal-footer">
-      <button class="btn btn-ghost" id="cred-back-btn" onclick="credBack()" style="display:none">BACK</button>
-      <button class="btn btn-ghost" onclick="closeModal('change-credential');resetCredFlow()">CANCEL</button>
-      <button class="btn btn-primary" id="cred-apply-btn" onclick="applyCredChange()" style="display:none">APPLY</button>
+      <button class="btn btn-ghost" id="cred-back-btn" onclick="credBack()" style="display:none">Back</button>
+      <button class="btn btn-ghost" onclick="closeModal('change-credential');resetCredFlow()">Cancel</button>
+      <button class="btn btn-primary" id="cred-apply-btn" onclick="applyCredChange()" style="display:none">Save changes</button>
     </div>
   </div>
 </div>
@@ -510,12 +507,12 @@
 <!-- Confirm delete vault -->
 <div class="modal-overlay" id="modal-confirm-delete-vault">
   <div class="modal">
-    <h3>Delete Vault?</h3>
+    <h3>Delete vault?</h3>
     <p style="font-size:13px;color:var(--muted);margin-bottom:8px;line-height:1.7" id="confirm-delete-vault-msg"></p>
-    <p style="font-size:12px;color:var(--red);margin-bottom:20px">This is permanent and cannot be undone.</p>
+    <p style="font-size:12px;color:var(--red);margin-bottom:20px">This can't be undone.</p>
     <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('confirm-delete-vault')">CANCEL</button>
-      <button class="btn btn-danger" id="confirm-delete-vault-btn">DELETE</button>
+      <button class="btn btn-ghost" onclick="closeModal('confirm-delete-vault')">Keep it</button>
+      <button class="btn btn-danger" id="confirm-delete-vault-btn">Delete</button>
     </div>
   </div>
 </div>
@@ -523,12 +520,12 @@
 <!-- Confirm reset all -->
 <div class="modal-overlay" id="modal-confirm-reset-all">
   <div class="modal">
-    <h3>Delete Everything?</h3>
-    <p style="font-size:13px;color:var(--muted);margin-bottom:8px;line-height:1.7">This will permanently delete all your vaults and all data stored on this device.</p>
-    <p style="font-size:12px;color:var(--red);margin-bottom:20px">There is no way to undo this.</p>
+    <h3>Delete everything?</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:8px;line-height:1.7">This will permanently delete all your vaults and everything in them from this device.</p>
+    <p style="font-size:12px;color:var(--red);margin-bottom:20px">There's no way to undo this.</p>
     <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('confirm-reset-all')">CANCEL</button>
-      <button class="btn btn-danger" onclick="doResetAll()">DELETE EVERYTHING</button>
+      <button class="btn btn-ghost" onclick="closeModal('confirm-reset-all')">Cancel</button>
+      <button class="btn btn-danger" onclick="doResetAll()">Delete everything</button>
     </div>
   </div>
 </div>
@@ -536,10 +533,10 @@
 <!-- Session expired -->
 <div class="modal-overlay" id="modal-session-expired">
   <div class="modal">
-    <h3>Vault Locked</h3>
-    <p style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.7" id="session-expired-msg">Your vault was locked automatically.</p>
+    <h3>You've been logged out</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.7" id="session-expired-msg">Your vault was locked for security.</p>
     <div class="modal-footer">
-      <button class="btn btn-primary btn-full" onclick="closeModal('session-expired')">OK</button>
+      <button class="btn btn-primary btn-full" onclick="closeModal('session-expired')">Got it</button>
     </div>
   </div>
 </div>
@@ -548,45 +545,45 @@
 <div class="modal-overlay" id="modal-import-vault">
   <div class="modal">
     <button class="modal-close" onclick="closeModal('import-vault');_pendingImport=null;history.replaceState(null,'',location.pathname+location.search)">✕</button>
-    <h3>Import Vault</h3>
-    <p style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.7">
-      Someone shared a vault link with you. Give it a name so you can tell it apart from your other vaults, then enter the password to open it.
+    <h3>Add shared vault</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.7">
+      Someone shared a vault with you. Give it a name so you can tell it apart from your others.
     </p>
     <div class="form-row">
-      <label>Vault Name</label>
+      <label>Name for this vault</label>
       <input type="text" id="import-name" placeholder="e.g. Shared by Alex…" autocomplete="off">
     </div>
     <div class="form-err" id="import-err"></div>
     <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('import-vault');_pendingImport=null;history.replaceState(null,'',location.pathname+location.search)">CANCEL</button>
-      <button class="btn btn-primary" onclick="confirmImport()">IMPORT VAULT</button>
+      <button class="btn btn-ghost" onclick="closeModal('import-vault');_pendingImport=null;history.replaceState(null,'',location.pathname+location.search)">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmImport()">Add vault</button>
     </div>
   </div>
 </div>
 
-<!-- Edit TOTP -->
+<!-- Edit login code -->
 <div class="modal-overlay" id="modal-edit-totp">
   <div class="modal">
     <button class="modal-close" onclick="closeModal('edit-totp')">✕</button>
-    <h3>Edit Login Code</h3>
+    <h3>Edit login code</h3>
     <input type="hidden" id="edit-totp-id">
     <div class="form-row">
       <label>Name</label>
       <input type="text" id="edit-totp-label" autocomplete="off">
     </div>
     <div class="form-row">
-      <label>Secret Key</label>
+      <label>Setup key</label>
       <div style="display:flex;gap:8px;align-items:stretch">
         <input type="text" id="edit-totp-secret" autocomplete="off" data-lpignore="true" spellcheck="false" style="letter-spacing:2px;flex:1">
-        <button class="btn btn-ghost btn-sm" onclick="copyEditSecret()" style="white-space:nowrap">⎘ COPY</button>
+        <button class="btn btn-ghost btn-sm" onclick="copyEditSecret()" style="white-space:nowrap">Copy</button>
       </div>
     </div>
     <div class="form-row">
-      <label>Website or App</label>
+      <label>Website or app</label>
       <input type="text" id="edit-totp-issuer" autocomplete="off">
     </div>
     <div class="form-row">
-      <label>Refresh period (seconds)</label>
+      <label>Refresh time (seconds)</label>
       <input type="number" id="edit-totp-period" min="15" max="120">
     </div>
     <div class="form-row">
@@ -595,8 +592,8 @@
     </div>
     <div class="form-err" id="edit-totp-err"></div>
     <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeModal('edit-totp')">CANCEL</button>
-      <button class="btn btn-primary" onclick="saveEditTOTP()">SAVE CHANGES</button>
+      <button class="btn btn-ghost" onclick="closeModal('edit-totp')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveEditTOTP()">Save</button>
     </div>
   </div>
 </div>
@@ -775,12 +772,12 @@ function renderLockScreen() {
     pickerWrap.innerHTML = '';
     unlockSec.style.display = 'none';
     divider.style.display   = 'none';
-    document.getElementById('lock-title').textContent = 'Welcome to Vault';
-    document.getElementById('lock-desc').textContent  = 'Your 2FA codes and private notes, fully encrypted and stored only on your device. Create a vault to get started.';
+    document.getElementById('lock-title').textContent = 'Welcome';
+    document.getElementById('lock-desc').textContent  = 'Your login codes and notes, fully encrypted and stored only on this device. Create a vault to get started.';
     _selectedVaultId = null;
   } else {
-    document.getElementById('lock-title').textContent = idx.length === 1 ? 'Enter Your Password' : 'Your Vaults';
-    document.getElementById('lock-desc').textContent  = 'Everything is fully encrypted and stored only on your device. Your password is never saved anywhere — with a strong password it would take longer than the age of the universe to crack.';
+    document.getElementById('lock-title').textContent = idx.length === 1 ? 'Welcome back' : 'Your vaults';
+    document.getElementById('lock-desc').textContent  = 'Everything is encrypted and only stored on your device. Your password is never saved anywhere.';
 
     // Build vault picker
     pickerWrap.innerHTML = idx.map(v => `
@@ -829,9 +826,9 @@ function configureUnlockUI(id) {
   pkBtn.style.display = (method === 'passkey' || method === 'both') ? '' : 'none';
 
   if (method === 'passkey') {
-    pkBtn.textContent = '🪪 UNLOCK WITH PASSKEY';
+    pkBtn.textContent = '🪪 Unlock with passkey';
   } else if (method === 'both') {
-    pkBtn.textContent = '🪪 USE PASSKEY INSTEAD';
+    pkBtn.textContent = '🪪 Use passkey instead';
   }
 }
 
@@ -841,7 +838,7 @@ async function unlock() {
   if (!pw) { setLockMsg('Please enter your password.', true); return; }
   if (!_selectedVaultId) { setLockMsg('Select a vault first.', true); return; }
 
-  setBusy(true, 'CHECKING…');
+  setBusy(true, 'Checking…');
   setLockMsg('Checking your password…', false);
 
   const verifier = localStorage.getItem(vKey(_selectedVaultId,'verifier'));
@@ -870,10 +867,10 @@ function setLockMsg(msg, isErr) {
   el.textContent = msg;
   el.className = msg ? (isErr ? 'err' : 'info') : '';
 }
-function setBusy(on, lbl='OPEN MY VAULT') {
+function setBusy(on, lbl='Open my vault') {
   const btn = document.getElementById('unlock-btn');
   btn.disabled = on;
-  btn.textContent = on ? lbl : 'OPEN MY VAULT';
+  btn.textContent = on ? lbl : 'Open my vault';
 }
 
 // ── Delete individual vault ───────────────────────────────────────────────
@@ -969,7 +966,7 @@ async function createVault() {
   }
 
   const btn = document.getElementById('create-btn');
-  btn.disabled=true; btn.textContent='CREATING…';
+  btn.disabled=true; btn.textContent='Setting up…';
 
   try {
     const newId = uid();
@@ -977,7 +974,7 @@ async function createVault() {
     if (_cvMethod==='passkey') {
       const secret   = b64e(rnd(32));
       const credData = await registerPasskey();
-      if (credData.error) { showErr(err, credData.error); btn.disabled=false; btn.textContent='CREATE VAULT'; return; }
+      if (credData.error) { showErr(err, credData.error); btn.disabled=false; btn.textContent='Create vault'; return; }
       const wrapped  = await wrapSecretWithCred(secret, credData.credId);
       localStorage.setItem(vKey(newId,'pkcred'), JSON.stringify({credId:credData.credId, wrappedSecret:wrapped}));
       vaultPw = secret;
@@ -1009,10 +1006,10 @@ async function createVault() {
 
     closeModal('create-vault');
     cvReset();
-    btn.disabled=false; btn.textContent='CREATE VAULT';
+    btn.disabled=false; btn.textContent='Create vault';
     showApp();
   } catch(e) {
-    btn.disabled=false; btn.textContent='CREATE VAULT';
+    btn.disabled=false; btn.textContent='Create vault';
     showErr(err,'Error: '+e.message);
   }
 }
@@ -1038,7 +1035,7 @@ function lockVault() {
   document.getElementById('app').classList.remove('visible');
   document.getElementById('lockscreen').style.display = '';
   document.getElementById('status-dot').classList.remove('unlocked');
-  document.getElementById('status-text').textContent = 'LOCKED';
+  document.getElementById('status-text').textContent = 'Locked';
   setLockMsg('', '');
 
   // Close all open modals and wipe any in-progress sensitive state
@@ -1054,7 +1051,7 @@ function showApp() {
   document.getElementById('lockscreen').style.display='none';
   document.getElementById('app').classList.add('visible');
   document.getElementById('status-dot').classList.add('unlocked');
-  document.getElementById('status-text').textContent='UNLOCKED';
+  document.getElementById('status-text').textContent='Unlocked';
   const info = getIndex().find(v=>v.id===_activeId);
   document.getElementById('active-vault-name').textContent = info ? info.name : '';
   // Always show share btn — passkey-only vaults show an explanation instead
@@ -1117,7 +1114,7 @@ async function unlockWithPasskey() {
   if (!pkData) return;
   if (!location.hostname) { setLockMsg('Passkeys only work when hosted — use your password instead.', true); return; }
   setLockMsg('Waiting for passkey…', false);
-  setBusy(true,'WAITING…');
+  setBusy(true,'Waiting for passkey…');
   try {
     const assertion = await navigator.credentials.get({publicKey:{
       challenge:rnd(32),
@@ -1216,7 +1213,7 @@ async function renderTOTP() {
   const list=document.getElementById('totp-list');
   const totps=_entries.filter(e=>e.type==='totp');
   document.getElementById('totp-count').textContent=`(${totps.length})`;
-  if(!totps.length){list.innerHTML=`<div class="empty">No login codes yet.<br>Click <span>+ ADD CODE</span> to add your first one.</div>`;return;}
+  if(!totps.length){list.innerHTML=`<div class="empty">No codes yet.<br>Click <span>+ Add code</span> to get started.</div>`;return;}
   list.innerHTML=totps.map(e=>`
     <div class="entry-card" id="card-${e.id}">
       <div class="card-actions">
@@ -1224,9 +1221,9 @@ async function renderTOTP() {
         <button class="btn-icon" title="Edit / view secret" onclick="openEditTOTP('${e.id}')">✏</button>
         <button class="btn-icon red" title="Remove" onclick="removeTOTP('${e.id}')">✕</button>
       </div>
-      <div class="badge totp">2FA CODE</div>
+      <div class="badge totp">Login code</div>
       <div class="card-label">${esc(e.label)}</div>
-      <div class="card-sub">${esc(e.issuer||'—')} · refreshes every ${e.period}s</div>
+      <div class="card-sub">${esc(e.issuer||'—')}</div>
       <div class="totp-code" id="code-${e.id}" onclick="copyCode('${e.id}')">——————</div>
       <div class="totp-bar-wrap"><div class="totp-bar" id="bar-${e.id}"></div></div>
       <div class="totp-remaining" id="rem-${e.id}"></div>
@@ -1275,14 +1272,14 @@ function renderNotes() {
   const list=document.getElementById('notes-list');
   const notes=_entries.filter(e=>e.type==='note');
   document.getElementById('notes-count').textContent=`(${notes.length})`;
-  if(!notes.length){list.innerHTML=`<div class="empty">No notes yet.<br>Click <span>+ ADD NOTE</span> to create one.</div>`;return;}
+  if(!notes.length){list.innerHTML=`<div class="empty">No notes yet.<br>Click <span>+ Add note</span> to create one.</div>`;return;}
   list.innerHTML=notes.map(n=>`
     <div class="entry-card">
       <div class="card-actions">
         <button class="btn-icon" title="View" onclick="viewNote('${n.id}')">👁</button>
         <button class="btn-icon red" title="Remove" onclick="removeNote('${n.id}')">✕</button>
       </div>
-      <div class="badge note">NOTE</div>${n.hasExtra?`<span class="badge locked" style="margin-left:4px">EXTRA LOCK</span>`:''}
+      <div class="badge note">Note</div>${n.hasExtra?`<span class="badge locked" style="margin-left:4px">Extra lock</span>`:''}
       <div class="card-label">${esc(n.title)}</div>
       <div class="card-sub">Saved ${new Date(n.created).toLocaleDateString()}</div>
       <div class="note-locked">🔒 Locked — click 👁 to read</div>
@@ -1345,7 +1342,7 @@ document.getElementById('new-pw').addEventListener('input',function(){
   const lbl=document.getElementById('pw-strength-label');
   if(!val){lbl.textContent='';return;}
   lbl.style.color=col;
-  lbl.textContent=est?(val.length<12?`Time to crack: ${est.label} ⚠ needs 12+ chars`:`Time to crack: ${est.label}`):'Enter a password';
+  lbl.textContent=est?(val.length<12?`${est.label} — needs to be at least 12 characters`:`${est.label} to crack`):'Choose a password above';
 });
 
 // Strength meter for change-password field in settings
@@ -1358,7 +1355,7 @@ document.getElementById('cred-new-pw').addEventListener('input', function(){
   const lbl=document.getElementById('cred-strength-label');
   if(!val){lbl.textContent='';return;}
   lbl.style.color=col;
-  lbl.textContent=est?(val.length<12?`Time to crack: ${est.label} ⚠ needs 12+ chars`:`Time to crack: ${est.label}`):'Enter a password';
+  lbl.textContent=est?(val.length<12?`${est.label} — needs to be at least 12 characters`:`${est.label} to crack`):'Choose a password above';
 });
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -1526,7 +1523,7 @@ function resetCredFlow() {
   document.getElementById('cred-strength-label').textContent = '';
   document.querySelectorAll('#cred-step-pick .method-btn').forEach(b => b.classList.remove('selected'));
   document.getElementById('cred-apply-btn').disabled = false;
-  document.getElementById('cred-apply-btn').textContent = 'APPLY';
+  document.getElementById('cred-apply-btn').textContent = 'Save changes';
   _credVerifiedSecret = null;
   _credNewMethod      = null;
 }
@@ -1586,10 +1583,10 @@ async function verifyCurrentCredential(via) {
         userVerification:'required', timeout:60000
       }});
       const secret = await unwrapSecretWithCred(pkData.wrappedSecret, b64e(assertion.rawId));
-      if (!secret) { showErr(err,'Could not verify passkey.'); btn.textContent='🪪 VERIFY WITH PASSKEY INSTEAD'; btn.disabled=false; return; }
+      if (!secret) { showErr(err,'Could not verify passkey.'); btn.textContent='🪪 Use passkey instead'; btn.disabled=false; return; }
       _credVerifiedSecret = secret;
-    } catch { showErr(err,'Passkey cancelled.'); btn.textContent='🪪 VERIFY WITH PASSKEY INSTEAD'; btn.disabled=false; return; }
-    btn.textContent='🪪 VERIFY WITH PASSKEY INSTEAD'; btn.disabled=false;
+    } catch { showErr(err,'Passkey cancelled.'); btn.textContent='🪪 Use passkey instead'; btn.disabled=false; return; }
+    btn.textContent='🪪 Use passkey instead'; btn.disabled=false;
   }
 
   // Move to step 2 — show picker, show back button
@@ -1631,7 +1628,7 @@ async function applyCredChange() {
   const err = document.getElementById('cred-apply-err');
   err.textContent=''; err.classList.remove('show');
   const btn = document.getElementById('cred-apply-btn');
-  btn.disabled=true; btn.textContent='APPLYING…';
+  btn.disabled=true; btn.textContent='Saving…';
 
   const needsPw = _credNewMethod === 'password' || _credNewMethod === 'both';
   const needsPk = _credNewMethod === 'passkey'  || _credNewMethod === 'both';
@@ -1641,8 +1638,8 @@ async function applyCredChange() {
   if (needsPw) {
     newPw = document.getElementById('cred-new-pw').value;
     const conf = document.getElementById('cred-confirm-pw').value;
-    if (newPw.length < 12) { showErr(err,'Password needs at least 12 characters.'); btn.disabled=false; btn.textContent='APPLY'; return; }
-    if (newPw !== conf)    { showErr(err,"Passwords don't match."); btn.disabled=false; btn.textContent='APPLY'; return; }
+    if (newPw.length < 12) { showErr(err,'Password needs at least 12 characters.'); btn.disabled=false; btn.textContent='Save changes'; return; }
+    if (newPw !== conf)    { showErr(err,"Passwords don't match."); btn.disabled=false; btn.textContent='Save changes'; return; }
   } else {
     // passkey-only: generate a new random secret as the vault key
     newPw = b64e(rnd(32));
@@ -1672,7 +1669,7 @@ async function applyCredChange() {
           document.getElementById('cred-pk-status').textContent = '⚠ Passkey failed — saved as password only.';
           _credNewMethod = 'password';
         } else {
-          showErr(err, credData.error); btn.disabled=false; btn.textContent='APPLY'; return;
+          showErr(err, credData.error); btn.disabled=false; btn.textContent='Save changes'; return;
         }
       } else {
         const wrapped = await wrapSecretWithCred(newPw, credData.credId);
@@ -1694,7 +1691,7 @@ async function applyCredChange() {
     toast('Unlock method updated.');
   } catch(e) {
     showErr(err,'Error: '+e.message);
-    btn.disabled=false; btn.textContent='APPLY';
+    btn.disabled=false; btn.textContent='Save changes';
   }
 }
 
