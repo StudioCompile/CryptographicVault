@@ -187,7 +187,7 @@
 <!-- ══ APP ══ -->
 <div id="app">
   <div id="topbar">
-    <button class="tab-btn active" onclick="switchTab('totp',this)">⏱ Login Codes</button>
+    <button class="tab-btn active" onclick="switchTab('totp',this)">⏱ 2FA Codes</button>
     <button class="tab-btn" onclick="switchTab('notes',this)">📝 Notes</button>
     <div class="spacer"></div>
     <span class="vault-name-badge" id="active-vault-name"></span>
@@ -198,7 +198,7 @@
   <div id="content">
     <div id="tab-totp" class="tab-panel active">
       <div class="sec-header">
-        <h3>Login Codes <span class="count" id="totp-count"></span></h3>
+        <h3>2FA Codes <span class="count" id="totp-count"></span></h3>
         <button class="btn btn-primary btn-sm" onclick="openModal('add-totp')">+ Add code</button>
       </div>
       <div class="card-grid" id="totp-list"></div>
@@ -276,13 +276,13 @@
 <div class="modal-overlay" id="modal-add-totp">
   <div class="modal">
     <button class="modal-close" onclick="closeModal('add-totp')">✕</button>
-    <h3>Add a login code</h3>
+    <h3>Add a 2FA code</h3>
     <div class="form-row">
       <label>Name — which account is this?</label>
       <input type="text" id="totp-label" placeholder="e.g. GitHub – username" autocomplete="off">
     </div>
     <div class="form-row">
-      <label>Setup key — the code shown when you enable 2-step verification</label>
+      <label>Secret code — shown when you enable 2FA on the website</label>
       <input type="text" id="totp-secret" placeholder="e.g. JBSWY3DPEHPK3PXP" autocomplete="off" spellcheck="false" style="letter-spacing:2px">
     </div>
     <div class="form-row">
@@ -411,7 +411,7 @@
     </div>
 
     <div style="border-top:1px solid var(--border);padding-top:14px">
-      <p style="font-size:12px;color:var(--muted);margin-bottom:10px">Danger zone</p>
+      <p style="font-size:12px;color:var(--muted);margin-bottom:10px">Delete vault</p>
       <button class="btn btn-danger btn-full" onclick="confirmDeleteCurrentVault()">Delete this vault</button>
     </div>
 
@@ -561,18 +561,18 @@
   </div>
 </div>
 
-<!-- Edit login code -->
+<!-- Edit 2FA code -->
 <div class="modal-overlay" id="modal-edit-totp">
   <div class="modal">
     <button class="modal-close" onclick="closeModal('edit-totp')">✕</button>
-    <h3>Edit login code</h3>
+    <h3>Edit 2FA code</h3>
     <input type="hidden" id="edit-totp-id">
     <div class="form-row">
       <label>Name</label>
       <input type="text" id="edit-totp-label" autocomplete="off">
     </div>
     <div class="form-row">
-      <label>Setup key</label>
+      <label>Secret code</label>
       <div style="display:flex;gap:8px;align-items:stretch">
         <input type="text" id="edit-totp-secret" autocomplete="off" data-lpignore="true" spellcheck="false" style="letter-spacing:2px;flex:1">
         <button class="btn btn-ghost btn-sm" onclick="copyEditSecret()" style="white-space:nowrap">Copy</button>
@@ -773,7 +773,7 @@ function renderLockScreen() {
     unlockSec.style.display = 'none';
     divider.style.display   = 'none';
     document.getElementById('lock-title').textContent = 'Welcome';
-    document.getElementById('lock-desc').textContent  = 'Your login codes and notes, fully encrypted and stored only on this device. Create a vault to get started.';
+    document.getElementById('lock-desc').textContent  = 'Your 2FA codes and notes, fully encrypted and stored only on this device. Create a vault to get started.';
     _selectedVaultId = null;
   } else {
     document.getElementById('lock-title').textContent = idx.length === 1 ? 'Welcome back' : 'Your vaults';
@@ -1205,7 +1205,7 @@ async function addTOTP() {
   await persistEntries();
   closeModal('add-totp'); clearIds('totp-label','totp-secret','totp-issuer','totp-notes');
   document.getElementById('totp-period').value='30';
-  renderTOTP(); toast('Login code saved!');
+  renderTOTP(); toast('2FA code saved!');
 }
 function removeTOTP(id){confirmDelete(async()=>{_entries=_entries.filter(e=>e.id!==id);await persistEntries();renderTOTP();toast('Entry deleted.');});}
 
@@ -1213,7 +1213,7 @@ async function renderTOTP() {
   const list=document.getElementById('totp-list');
   const totps=_entries.filter(e=>e.type==='totp');
   document.getElementById('totp-count').textContent=`(${totps.length})`;
-  if(!totps.length){list.innerHTML=`<div class="empty">No codes yet.<br>Click <span>+ Add code</span> to get started.</div>`;return;}
+  if(!totps.length){list.innerHTML=`<div class="empty">No 2FA codes yet.<br>Click <span>+ Add code</span> to get started.</div>`;return;}
   list.innerHTML=totps.map(e=>`
     <div class="entry-card" id="card-${e.id}">
       <div class="card-actions">
@@ -1221,7 +1221,7 @@ async function renderTOTP() {
         <button class="btn-icon" title="Edit / view secret" onclick="openEditTOTP('${e.id}')">✏</button>
         <button class="btn-icon red" title="Remove" onclick="removeTOTP('${e.id}')">✕</button>
       </div>
-      <div class="badge totp">Login code</div>
+      <div class="badge totp">2FA code</div>
       <div class="card-label">${esc(e.label)}</div>
       <div class="card-sub">${esc(e.issuer||'—')}</div>
       <div class="totp-code" id="code-${e.id}" onclick="copyCode('${e.id}')">——————</div>
@@ -1750,7 +1750,7 @@ async function saveEditTOTP() {
   await persistEntries();
   closeModal('edit-totp');
   renderTOTP();
-  toast('Login code updated.');
+  toast('2FA code updated.');
 }
 
 async function copyEditSecret() {
