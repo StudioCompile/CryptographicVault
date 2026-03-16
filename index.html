@@ -398,88 +398,21 @@
   </div>
 </div>
 
-<!-- Vault Settings -->
+<!-- Vault Settings (compact) -->
 <div class="modal-overlay" id="modal-vault-settings">
-  <div class="modal" style="max-width:480px">
+  <div class="modal">
     <button class="modal-close" onclick="closeModal('vault-settings')">✕</button>
     <h3>Vault Settings</h3>
 
-    <!-- Rename -->
     <div class="form-row">
       <label>Vault Name</label>
       <input type="text" id="settings-name" placeholder="e.g. Personal, Work…" autocomplete="off">
     </div>
 
-    <!-- Change credential -->
-    <div style="border-top:1px solid var(--border);padding-top:14px;margin-bottom:14px">
-      <p style="font-size:11px;color:var(--muted);margin-bottom:12px;letter-spacing:.5px">CHANGE UNLOCK METHOD</p>
-
-      <!-- Step 1: verify current credential -->
-      <div id="cred-step-verify">
-        <p style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.6" id="cred-verify-hint">Verify your current password to change your unlock method.</p>
-        <div id="cred-verify-pw-row" class="form-row">
-          <label>Current Password</label>
-          <input type="password" id="cred-verify-pw" placeholder="Your current password…"
-            autocomplete="off" data-lpignore="true" data-form-type="other"
-            readonly onfocus="this.removeAttribute('readonly')">
-        </div>
-        <div class="form-err" id="cred-verify-err"></div>
-        <div style="display:flex;gap:8px;margin-top:4px">
-          <button class="btn btn-ghost btn-full" id="cred-verify-pw-btn" onclick="verifyCurrentCredential('password')">VERIFY PASSWORD</button>
-          <button class="btn btn-ghost btn-full" id="cred-verify-pk-btn" onclick="verifyCurrentCredential('passkey')" style="display:none">🪪 VERIFY PASSKEY</button>
-        </div>
-      </div>
-
-      <!-- Step 2: pick new method (same cards as create vault) -->
-      <div id="cred-step-pick" style="display:none">
-        <p style="font-size:12px;color:var(--muted);margin-bottom:10px;line-height:1.6">✓ Verified. Now choose your new unlock method:</p>
-        <div style="display:flex;flex-direction:column;gap:8px">
-          <button class="method-btn" id="cred-mb-pw"   onclick="pickCredMethod('password')">
-            <div class="method-icon">🔑</div>
-            <div><div class="method-title">Password only</div><div class="method-desc">Type a password to unlock. Supports share links.</div></div>
-          </button>
-          <button class="method-btn" id="cred-mb-pk"   onclick="pickCredMethod('passkey')">
-            <div class="method-icon">🪪</div>
-            <div><div class="method-title">Passkey only</div><div class="method-desc">Fingerprint, Face ID, or PIN. This device only.</div></div>
-          </button>
-          <button class="method-btn" id="cred-mb-both" onclick="pickCredMethod('both')">
-            <div class="method-icon">🛡</div>
-            <div><div class="method-title">Both</div><div class="method-desc">Passkey for quick unlock, password for share links.</div></div>
-          </button>
-        </div>
-      </div>
-
-      <!-- Step 3: enter new password (if method needs one) -->
-      <div id="cred-step-pw" style="display:none">
-        <div class="form-row" style="margin-top:10px">
-          <label>New Password</label>
-          <input type="password" id="cred-new-pw" placeholder="At least 12 characters…"
-            autocomplete="off" data-lpignore="true" data-form-type="other"
-            readonly onfocus="this.removeAttribute('readonly')">
-          <div class="strength-bar"><div class="strength-fill" id="cred-strength-fill"></div></div>
-          <div style="font-size:10px;color:var(--muted);margin-top:4px" id="cred-strength-label"></div>
-        </div>
-        <div class="form-row">
-          <label>Confirm New Password</label>
-          <input type="password" id="cred-confirm-pw" placeholder="Type new password again…"
-            autocomplete="off" data-lpignore="true" data-form-type="other"
-            readonly onfocus="this.removeAttribute('readonly')">
-        </div>
-      </div>
-
-      <!-- Step 3b: passkey registration status -->
-      <div id="cred-step-pk-status" style="display:none">
-        <p style="font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6" id="cred-pk-status-msg">Click Apply and your browser will ask you to set up a passkey.</p>
-      </div>
-
-      <div class="form-err" id="cred-apply-err"></div>
-      <div style="display:flex;gap:8px;margin-top:10px" id="cred-apply-row" style="display:none">
-        <button class="btn btn-ghost btn-full" onclick="credBack()">BACK</button>
-        <button class="btn btn-primary btn-full" id="cred-apply-btn" onclick="applyCredChange()">APPLY</button>
-      </div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px">
+      <button class="btn btn-ghost btn-full" onclick="openCredentialChange()">🔑 CHANGE UNLOCK METHOD</button>
     </div>
 
-    <!-- Danger zone -->
     <div style="border-top:1px solid var(--border);padding-top:14px">
       <p style="font-size:11px;color:var(--muted);margin-bottom:10px;letter-spacing:.5px">DANGER ZONE</p>
       <button class="btn btn-danger btn-full" onclick="confirmDeleteCurrentVault()">🗑 DELETE THIS VAULT</button>
@@ -488,6 +421,88 @@
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('vault-settings')">CLOSE</button>
       <button class="btn btn-primary" onclick="saveVaultSettings()">SAVE NAME</button>
+    </div>
+  </div>
+</div>
+
+<!-- Change Unlock Method (separate modal, like create vault) -->
+<div class="modal-overlay" id="modal-change-credential">
+  <div class="modal" style="max-width:500px">
+    <button class="modal-close" onclick="closeModal('change-credential');resetCredFlow()">✕</button>
+    <h3 id="cred-modal-title">Change Unlock Method</h3>
+
+    <!-- Step 1: verify identity -->
+    <div id="cred-step-verify">
+      <p style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.7" id="cred-verify-hint">
+        Verify your identity first before changing how you unlock this vault.
+      </p>
+      <div id="cred-verify-pw-row" class="form-row">
+        <label>Current Password</label>
+        <input type="password" id="cred-verify-pw" placeholder="Your current password…"
+          autocomplete="off" data-lpignore="true" data-form-type="other"
+          readonly onfocus="this.removeAttribute('readonly')"
+          onkeydown="if(event.key==='Enter')verifyCurrentCredential('password')">
+      </div>
+      <div class="form-err" id="cred-verify-err"></div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+        <button class="btn btn-primary btn-full" id="cred-verify-pw-btn" onclick="verifyCurrentCredential('password')">VERIFY PASSWORD</button>
+        <button class="btn btn-ghost btn-full" id="cred-verify-pk-btn" onclick="verifyCurrentCredential('passkey')" style="display:none">🪪 VERIFY WITH PASSKEY INSTEAD</button>
+      </div>
+    </div>
+
+    <!-- Step 2: pick new method (mirrors create vault cards) -->
+    <div id="cred-step-pick" style="display:none">
+      <p style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.7">
+        ✓ Verified. Choose your new unlock method:
+      </p>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <button class="method-btn" id="cred-mb-pw" onclick="pickCredMethod('password')">
+          <div class="method-icon">🔑</div>
+          <div><div class="method-title">Password</div><div class="method-desc">Type a password to unlock. Supports share links to transfer to other devices.</div></div>
+        </button>
+        <button class="method-btn" id="cred-mb-pk" onclick="pickCredMethod('passkey')">
+          <div class="method-icon">🪪</div>
+          <div><div class="method-title">Passkey only</div><div class="method-desc">Use fingerprint, Face ID, or device PIN. This device only — no share link.</div></div>
+        </button>
+        <button class="method-btn" id="cred-mb-both" onclick="pickCredMethod('both')">
+          <div class="method-icon">🛡</div>
+          <div><div class="method-title">Both</div><div class="method-desc">Passkey for quick unlock on this device, plus a password for share links.</div></div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 3: password fields -->
+    <div id="cred-step-pw" style="display:none">
+      <div class="form-row" style="margin-top:14px">
+        <label>New Password</label>
+        <input type="password" id="cred-new-pw" placeholder="At least 12 characters…"
+          autocomplete="off" data-lpignore="true" data-form-type="other"
+          readonly onfocus="this.removeAttribute('readonly')">
+        <div class="strength-bar"><div class="strength-fill" id="cred-strength-fill"></div></div>
+        <div style="font-size:10px;color:var(--muted);margin-top:4px" id="cred-strength-label"></div>
+      </div>
+      <div class="form-row">
+        <label>Confirm New Password</label>
+        <input type="password" id="cred-confirm-pw" placeholder="Type new password again…"
+          autocomplete="off" data-lpignore="true" data-form-type="other"
+          readonly onfocus="this.removeAttribute('readonly')">
+      </div>
+    </div>
+
+    <!-- Step 3b: passkey info -->
+    <div id="cred-step-pk" style="display:none">
+      <p style="font-size:12px;color:var(--muted);margin-top:14px;line-height:1.7" id="cred-pk-info-text">
+        Click Apply and your browser will ask you to set up a passkey.
+      </p>
+      <div style="font-size:12px;color:var(--muted);min-height:18px" id="cred-pk-status"></div>
+    </div>
+
+    <div class="form-err" id="cred-apply-err"></div>
+
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="cred-back-btn" onclick="credBack()" style="display:none">BACK</button>
+      <button class="btn btn-ghost" onclick="closeModal('change-credential');resetCredFlow()">CANCEL</button>
+      <button class="btn btn-primary" id="cred-apply-btn" onclick="applyCredChange()" style="display:none">APPLY</button>
     </div>
   </div>
 </div>
@@ -1026,8 +1041,12 @@ function lockVault() {
   document.getElementById('status-text').textContent = 'LOCKED';
   setLockMsg('', '');
 
+  // Close all open modals and wipe any in-progress sensitive state
+  document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
+  _credVerifiedSecret = null;
+  _credNewMethod      = null;
+
   // Only re-render the lock screen if we were actually unlocked
-  // This prevents the visibilitychange event from closing modals on load
   if (wasOpen) renderLockScreen();
 }
 
@@ -1453,7 +1472,6 @@ function openVaultSettings() {
   const idx  = getIndex();
   const info = idx.find(v => v.id === _activeId);
   document.getElementById('settings-name').value = info ? info.name : '';
-  resetCredFlow();
   openModal('vault-settings');
 }
 
@@ -1467,6 +1485,11 @@ function saveVaultSettings() {
   toast('Name saved.');
 }
 
+function openCredentialChange() {
+  resetCredFlow();
+  openModal('change-credential');
+}
+
 // ── Unified credential change flow ────────────────────────────────────────
 
 let _credVerifiedSecret = null; // vault secret confirmed by current credential
@@ -1474,24 +1497,25 @@ let _credNewMethod      = null; // method the user picked for the new setup
 
 function resetCredFlow() {
   const method = localStorage.getItem(vKey(_activeId,'method')) || 'password';
-  const hasPasskey = method === 'passkey' || method === 'both';
+  const hasPasskey  = method === 'passkey' || method === 'both';
   const hasPassword = method === 'password' || method === 'both';
 
-  // Step 1 — show correct verify controls
+  // Show step 1, hide all others
   document.getElementById('cred-step-verify').style.display  = '';
   document.getElementById('cred-step-pick').style.display    = 'none';
   document.getElementById('cred-step-pw').style.display      = 'none';
-  document.getElementById('cred-step-pk-status').style.display = 'none';
-  document.getElementById('cred-apply-row').style.display    = 'none';
+  document.getElementById('cred-step-pk').style.display      = 'none';
+  document.getElementById('cred-back-btn').style.display     = 'none';
+  document.getElementById('cred-apply-btn').style.display    = 'none';
 
   document.getElementById('cred-verify-pw-row').style.display = hasPassword ? '' : 'none';
   document.getElementById('cred-verify-pw-btn').style.display = hasPassword ? '' : 'none';
   document.getElementById('cred-verify-pk-btn').style.display = hasPasskey  ? '' : 'none';
   document.getElementById('cred-verify-hint').textContent = hasPassword && hasPasskey
-    ? 'Verify your current password or passkey to change your unlock method.'
+    ? 'Verify your current password or passkey first.'
     : hasPasskey
-    ? 'Verify your passkey to change your unlock method.'
-    : 'Verify your current password to change your unlock method.';
+    ? 'Verify your passkey first.'
+    : 'Verify your current password first.';
 
   clearIds('cred-verify-pw','cred-new-pw','cred-confirm-pw');
   document.getElementById('cred-verify-err').textContent = '';
@@ -1508,16 +1532,33 @@ function resetCredFlow() {
 }
 
 function credBack() {
-  // Go back to step 1 but keep verified secret
-  document.getElementById('cred-step-pick').style.display      = _credVerifiedSecret ? '' : 'none';
-  document.getElementById('cred-step-pw').style.display        = 'none';
-  document.getElementById('cred-step-pk-status').style.display = 'none';
-  document.getElementById('cred-apply-row').style.display      = 'none';
-  document.getElementById('cred-apply-err').textContent        = '';
-  document.getElementById('cred-apply-err').classList.remove('show');
-  document.querySelectorAll('#cred-step-pick .method-btn').forEach(b => b.classList.remove('selected'));
-  clearIds('cred-new-pw','cred-confirm-pw');
-  _credNewMethod = null;
+  const pickVisible = document.getElementById('cred-step-pick').style.display !== 'none';
+
+  if (!pickVisible) {
+    // On step 3 — go back to step 2 (picker)
+    document.getElementById('cred-step-pick').style.display = '';
+    document.getElementById('cred-step-pw').style.display   = 'none';
+    document.getElementById('cred-step-pk').style.display   = 'none';
+    document.getElementById('cred-apply-btn').style.display = 'none';
+    document.getElementById('cred-apply-err').textContent   = '';
+    document.getElementById('cred-apply-err').classList.remove('show');
+    document.querySelectorAll('#cred-step-pick .method-btn').forEach(b => b.classList.remove('selected'));
+    clearIds('cred-new-pw','cred-confirm-pw');
+    _credNewMethod = null;
+    // Keep BACK visible so user can go back to step 1 too
+    document.getElementById('cred-back-btn').style.display = '';
+  } else {
+    // On step 2 — go back to step 1 (verify)
+    document.getElementById('cred-step-verify').style.display = '';
+    document.getElementById('cred-step-pick').style.display   = 'none';
+    document.getElementById('cred-back-btn').style.display    = 'none';
+    document.getElementById('cred-verify-err').textContent    = '';
+    document.getElementById('cred-verify-err').classList.remove('show');
+    document.querySelectorAll('#cred-step-pick .method-btn').forEach(b => b.classList.remove('selected'));
+    clearIds('cred-verify-pw');
+    _credVerifiedSecret = null;
+    _credNewMethod      = null;
+  }
 }
 
 async function verifyCurrentCredential(via) {
@@ -1545,15 +1586,16 @@ async function verifyCurrentCredential(via) {
         userVerification:'required', timeout:60000
       }});
       const secret = await unwrapSecretWithCred(pkData.wrappedSecret, b64e(assertion.rawId));
-      if (!secret) { showErr(err,'Could not verify passkey.'); btn.textContent='🪪 VERIFY PASSKEY'; btn.disabled=false; return; }
+      if (!secret) { showErr(err,'Could not verify passkey.'); btn.textContent='🪪 VERIFY WITH PASSKEY INSTEAD'; btn.disabled=false; return; }
       _credVerifiedSecret = secret;
-    } catch { showErr(err,'Passkey cancelled.'); btn.textContent='🪪 VERIFY PASSKEY'; btn.disabled=false; return; }
-    btn.textContent='🪪 VERIFY PASSKEY'; btn.disabled=false;
+    } catch { showErr(err,'Passkey cancelled.'); btn.textContent='🪪 VERIFY WITH PASSKEY INSTEAD'; btn.disabled=false; return; }
+    btn.textContent='🪪 VERIFY WITH PASSKEY INSTEAD'; btn.disabled=false;
   }
 
-  // Move to step 2 — show picker
+  // Move to step 2 — show picker, show back button
   document.getElementById('cred-step-verify').style.display = 'none';
   document.getElementById('cred-step-pick').style.display   = '';
+  document.getElementById('cred-back-btn').style.display    = '';
 }
 
 function pickCredMethod(m) {
@@ -1564,15 +1606,21 @@ function pickCredMethod(m) {
 
   const needsPw = m === 'password' || m === 'both';
   const needsPk = m === 'passkey'  || m === 'both';
-  document.getElementById('cred-step-pw').style.display        = needsPw ? '' : 'none';
-  document.getElementById('cred-step-pk-status').style.display = needsPk ? '' : 'none';
-  document.getElementById('cred-apply-row').style.display      = '';
+
+  // Hide picker, show relevant step(s)
+  document.getElementById('cred-step-pick').style.display = 'none';
+  document.getElementById('cred-step-pw').style.display   = needsPw ? '' : 'none';
+  document.getElementById('cred-step-pk').style.display   = needsPk ? '' : 'none';
+  document.getElementById('cred-apply-btn').style.display = '';
+  document.getElementById('cred-back-btn').style.display  = '';
 
   if (needsPk) {
-    document.getElementById('cred-pk-status-msg').textContent = m === 'both'
-      ? 'A passkey will be registered after you set the password.'
-      : 'Your browser will ask you to set up a passkey when you click Apply.';
+    document.getElementById('cred-pk-info-text').textContent = m === 'both'
+      ? 'After setting your password, a passkey will be registered on this device.'
+      : 'Click Apply and your browser will ask you to set up a passkey.';
+    document.getElementById('cred-pk-status').textContent = '';
   }
+
   document.getElementById('cred-apply-err').textContent = '';
   document.getElementById('cred-apply-err').classList.remove('show');
   clearIds('cred-new-pw','cred-confirm-pw');
@@ -1617,12 +1665,11 @@ async function applyCredChange() {
 
     // Handle passkey
     if (needsPk) {
-      document.getElementById('cred-pk-status-msg').textContent = 'Registering passkey…';
+      document.getElementById('cred-pk-status').textContent = 'Registering passkey…';
       const credData = await registerPasskey();
       if (credData.error) {
         if (_credNewMethod === 'both') {
-          // Passkey failed but password is set — fall back to password-only
-          document.getElementById('cred-pk-status-msg').textContent = '⚠ Passkey failed — saved as password only.';
+          document.getElementById('cred-pk-status').textContent = '⚠ Passkey failed — saved as password only.';
           _credNewMethod = 'password';
         } else {
           showErr(err, credData.error); btn.disabled=false; btn.textContent='APPLY'; return;
@@ -1643,7 +1690,7 @@ async function applyCredChange() {
 
     _credVerifiedSecret = null;
     _credNewMethod      = null;
-    closeModal('vault-settings');
+    closeModal('change-credential');
     toast('Unlock method updated.');
   } catch(e) {
     showErr(err,'Error: '+e.message);
