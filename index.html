@@ -6,6 +6,7 @@
 <title>Vault</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext x='50%25' y='54%25' dominant-baseline='central' text-anchor='middle' font-family='Arial Black%2C sans-serif' font-weight='900' font-size='30' fill='%23000'%3EV%3C/text%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
 <style>
 :root {
   --bg: #f5f5f3;
@@ -115,7 +116,6 @@ body {
 .vault-card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-left: 2px solid transparent;
   border-radius: var(--radius-lg);
   padding: 24px;
   cursor: pointer;
@@ -125,7 +125,6 @@ body {
 
 .vault-card:hover {
   border-color: var(--border2);
-  border-left-color: var(--text);
   background: var(--surface-2);
 }
 
@@ -612,13 +611,12 @@ body {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 20px;
-  border-left: 2px solid var(--border2);
+  border-left: 1px solid var(--border);
   transition: border-color 0.12s, background 0.12s;
 }
 
 .totp-card:hover {
   background: var(--surface-2);
-  border-color: var(--border2);
 }
 
 .totp-card-info-row {
@@ -784,7 +782,6 @@ body {
   cursor: pointer;
   transition: background 0.1s;
   gap: 16px;
-  border-left: 2px solid transparent;
 }
 
 .file-item:last-child {
@@ -793,7 +790,6 @@ body {
 
 .file-item:hover {
   background: var(--surface-2);
-  border-left-color: var(--border2);
 }
 
 .file-icon,
@@ -1312,7 +1308,64 @@ body {
   transform: translateX(-50%) translateY(0);
 }
 
-/* ══ EMPTY STATE ══ */
+/* ══ QR SCANNER ══ */
+.qr-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 20px; }
+.qr-tab { padding: 10px 0; margin-right: 24px; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; background: none; border: none; border-bottom: 2px solid transparent; color: var(--muted); cursor: pointer; font-family: var(--body); transition: color 0.12s; }
+.qr-tab.active { color: var(--text); border-bottom-color: var(--text); }
+.qr-panel { display: none; }
+.qr-panel.active { display: block; }
+.qr-viewfinder {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  background: #000;
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.qr-viewfinder video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.qr-viewfinder canvas { display: none; }
+.qr-corner {
+  position: absolute;
+  width: 40px; height: 40px;
+  border-color: #fff;
+  border-style: solid;
+  opacity: 0.8;
+}
+.qr-corner.tl { top: 16px; left: 16px; border-width: 2px 0 0 2px; }
+.qr-corner.tr { top: 16px; right: 16px; border-width: 2px 2px 0 0; }
+.qr-corner.bl { bottom: 16px; left: 16px; border-width: 0 0 2px 2px; }
+.qr-corner.br { bottom: 16px; right: 16px; border-width: 0 2px 2px 0; }
+.qr-scan-line {
+  position: absolute;
+  left: 16px; right: 16px;
+  height: 1px;
+  background: rgba(255,255,255,0.6);
+  animation: qr-scan 2s ease-in-out infinite;
+}
+@keyframes qr-scan {
+  0%, 100% { top: 16px; }
+  50% { top: calc(100% - 16px); }
+}
+.qr-status { font-size: 13px; color: var(--muted); text-align: center; margin-bottom: 12px; min-height: 20px; }
+.qr-status.ok { color: var(--green); font-weight: 500; }
+.qr-status.err { color: var(--red); }
+.qr-upload-area {
+  border: 1px dashed var(--border2);
+  border-radius: var(--radius);
+  padding: 36px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+  margin-bottom: 12px;
+}
+.qr-upload-area:hover { background: var(--surface-2); border-color: var(--text); }
+.qr-upload-area svg { display: block; margin: 0 auto 10px; opacity: 0.4; }
+.qr-upload-label { font-size: 13px; color: var(--muted); }
+.qr-upload-label strong { color: var(--text); display: block; margin-bottom: 4px; font-size: 14px; }
+.qr-uri-hint { font-size: 12px; color: var(--muted); margin-top: 8px; }
+
+
 .empty-state {
   text-align: center;
   padding: 60px 20px;
@@ -1667,6 +1720,21 @@ body {
   <div class="modal">
     <button class="modal-close" onclick="closeModal('add-totp')">✕</button>
     <h3>Add a 2FA code</h3>
+    <div style="display:flex;gap:8px;margin-bottom:20px">
+      <button class="btn btn-outline" style="flex:1" onclick="openQRScanner()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="3" height="3"/><rect x="19" y="14" width="2" height="2"/><rect x="14" y="19" width="2" height="2"/><rect x="19" y="19" width="2" height="2"/></svg>
+        Scan QR code
+      </button>
+      <button class="btn btn-outline" style="flex:1" onclick="openURIEntry()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        Paste URI
+      </button>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;color:var(--muted);font-size:12px">
+      <div style="flex:1;height:1px;background:var(--border)"></div>
+      or enter manually
+      <div style="flex:1;height:1px;background:var(--border)"></div>
+    </div>
     <div class="form-group">
       <label class="form-label">Name</label>
       <input type="text" id="totp-label" class="form-input" placeholder="e.g. GitHub" autocomplete="off">
@@ -1690,6 +1758,60 @@ body {
     </div>
   </div>
 </div>
+
+<!-- QR Scanner modal -->
+<div class="modal-overlay" id="modal-qr-scanner">
+  <div class="modal" style="max-width:420px">
+    <button class="modal-close" onclick="closeQRScanner()">✕</button>
+    <h3>Scan QR code</h3>
+    <div class="qr-tabs">
+      <button class="qr-tab active" onclick="switchQRTab('camera')">Camera</button>
+      <button class="qr-tab" onclick="switchQRTab('upload')">Upload image</button>
+    </div>
+    <div class="qr-panel active" id="qr-panel-camera">
+      <div class="qr-viewfinder" id="qr-viewfinder">
+        <video id="qr-video" autoplay muted playsinline></video>
+        <canvas id="qr-canvas"></canvas>
+        <div class="qr-corner tl"></div>
+        <div class="qr-corner tr"></div>
+        <div class="qr-corner bl"></div>
+        <div class="qr-corner br"></div>
+        <div class="qr-scan-line" id="qr-scan-line"></div>
+      </div>
+      <div class="qr-status" id="qr-status-camera">Point your camera at a QR code</div>
+    </div>
+    <div class="qr-panel" id="qr-panel-upload">
+      <div class="qr-upload-area" onclick="document.getElementById('qr-file-input').click()">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3"/><path d="M17 21v-4h4"/></svg>
+        <div class="qr-upload-label">
+          <strong>Choose a QR code image</strong>
+          Screenshot, saved image, or photo
+        </div>
+      </div>
+      <input type="file" id="qr-file-input" accept="image/*" style="display:none" onchange="handleQRImage(this)">
+      <div class="qr-status" id="qr-status-upload"></div>
+    </div>
+  </div>
+</div>
+
+<!-- URI paste modal -->
+<div class="modal-overlay" id="modal-uri-entry">
+  <div class="modal" style="max-width:420px">
+    <button class="modal-close" onclick="closeModal('uri-entry')">✕</button>
+    <h3>Paste OTP URI</h3>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Paste an <code style="font-family:var(--mono);font-size:12px;background:var(--surface-2);padding:2px 5px;border-radius:2px">otpauth://</code> URI — you can get one by exporting from another authenticator app or copying the link from a QR code.</p>
+    <div class="form-group">
+      <label class="form-label">OTP URI</label>
+      <input type="text" id="uri-input" class="form-input" placeholder="otpauth://totp/GitHub?secret=..." autocomplete="off" spellcheck="false" style="font-family:var(--mono);font-size:12px">
+    </div>
+    <div class="form-error" id="uri-err"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('uri-entry')">Cancel</button>
+      <button class="btn btn-primary" onclick="importFromURI()">Import</button>
+    </div>
+  </div>
+</div>
+
 
 <!-- Add Note / File metadata -->
 <div class="modal-overlay" id="modal-add-note">
@@ -2671,6 +2793,187 @@ async function generateTOTP(secret, period = 30) {
 }
 const totpRemaining = (p = 30) => p - (Math.floor(Date.now() / 1000) % p);
 
+/* ══ OTP URI PARSING ══ */
+function parseOTPUri(uri) {
+  try {
+    if (!uri.startsWith('otpauth://')) throw new Error('Not an otpauth URI');
+    const url = new URL(uri);
+    const type = url.hostname; // 'totp' or 'hotp'
+    if (type !== 'totp') throw new Error('Only TOTP is supported');
+    const params = url.searchParams;
+    const secret = params.get('secret');
+    if (!secret) throw new Error('No secret in URI');
+    // Label is in the path: /ISSUER:ACCOUNT or /ACCOUNT
+    let rawLabel = decodeURIComponent(url.pathname.slice(1));
+    let issuer = params.get('issuer') || '';
+    let label = rawLabel;
+    if (rawLabel.includes(':')) {
+      const parts = rawLabel.split(':');
+      if (!issuer) issuer = parts[0].trim();
+      label = parts[1].trim();
+    }
+    const period = parseInt(params.get('period')) || 30;
+    const algorithm = params.get('algorithm') || 'SHA1';
+    const digits = parseInt(params.get('digits')) || 6;
+    return { label, issuer, secret: secret.replace(/\s/g, '').toUpperCase(), period, algorithm, digits };
+  } catch (e) {
+    throw new Error(e.message);
+  }
+}
+
+function fillTOTPFromParsed(parsed) {
+  document.getElementById('totp-label').value = parsed.label || '';
+  document.getElementById('totp-secret').value = parsed.secret || '';
+  document.getElementById('totp-issuer').value = parsed.issuer || '';
+  document.getElementById('totp-period').value = parsed.period || 30;
+}
+
+/* ══ URI PASTE MODAL ══ */
+function openURIEntry() {
+  document.getElementById('uri-input').value = '';
+  document.getElementById('uri-err').style.display = 'none';
+  openModal('uri-entry');
+}
+
+function importFromURI() {
+  const uri = document.getElementById('uri-input').value.trim();
+  const err = document.getElementById('uri-err');
+  err.style.display = 'none';
+  try {
+    const parsed = parseOTPUri(uri);
+    fillTOTPFromParsed(parsed);
+    closeModal('uri-entry');
+    toast('URI imported — review and save.');
+  } catch (e) {
+    showErr(err, 'Invalid URI: ' + e.message);
+  }
+}
+
+/* ══ QR SCANNER ══ */
+let _qrStream = null, _qrAnimFrame = null, _qrFound = false;
+
+function openQRScanner() {
+  _qrFound = false;
+  openModal('qr-scanner');
+  switchQRTab('camera');
+  startQRCamera();
+}
+
+function closeQRScanner() {
+  stopQRCamera();
+  closeModal('qr-scanner');
+}
+
+function switchQRTab(tab) {
+  document.querySelectorAll('.qr-tab').forEach((t, i) => {
+    const tabs = ['camera', 'upload'];
+    t.classList.toggle('active', tabs[i] === tab);
+  });
+  document.getElementById('qr-panel-camera').classList.toggle('active', tab === 'camera');
+  document.getElementById('qr-panel-upload').classList.toggle('active', tab === 'upload');
+  if (tab === 'camera') { startQRCamera(); }
+  else { stopQRCamera(); }
+}
+
+async function startQRCamera() {
+  stopQRCamera();
+  _qrFound = false;
+  const status = document.getElementById('qr-status-camera');
+  status.textContent = 'Starting camera…';
+  status.className = 'qr-status';
+  try {
+    _qrStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 1280 } }
+    });
+    const video = document.getElementById('qr-video');
+    video.srcObject = _qrStream;
+    await video.play();
+    status.textContent = 'Point your camera at a QR code';
+    scanQRFrame();
+  } catch (e) {
+    status.textContent = 'Camera access denied — use Upload or Paste URI instead.';
+    status.className = 'qr-status err';
+  }
+}
+
+function stopQRCamera() {
+  if (_qrAnimFrame) { cancelAnimationFrame(_qrAnimFrame); _qrAnimFrame = null; }
+  if (_qrStream) { _qrStream.getTracks().forEach(t => t.stop()); _qrStream = null; }
+  const video = document.getElementById('qr-video');
+  if (video) video.srcObject = null;
+}
+
+function scanQRFrame() {
+  if (_qrFound) return;
+  const video = document.getElementById('qr-video');
+  const canvas = document.getElementById('qr-canvas');
+  if (!video || !canvas || video.readyState < 2) {
+    _qrAnimFrame = requestAnimationFrame(scanQRFrame); return;
+  }
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0);
+  const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const code = jsQR(imgData.data, imgData.width, imgData.height, { inversionAttempts: 'dontInvert' });
+  if (code && code.data) {
+    onQRDetected(code.data, 'camera');
+  } else {
+    _qrAnimFrame = requestAnimationFrame(scanQRFrame);
+  }
+}
+
+function handleQRImage(input) {
+  const file = input.files[0];
+  input.value = '';
+  if (!file) return;
+  const status = document.getElementById('qr-status-upload');
+  status.textContent = 'Reading image…';
+  status.className = 'qr-status';
+  const img = new Image();
+  img.onload = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = img.width; canvas.height = img.height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0);
+    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const code = jsQR(imgData.data, imgData.width, imgData.height, { inversionAttempts: 'attemptBoth' });
+    if (code && code.data) {
+      onQRDetected(code.data, 'upload');
+    } else {
+      status.textContent = 'No QR code found in that image.';
+      status.className = 'qr-status err';
+    }
+  };
+  img.onerror = () => {
+    status.textContent = 'Could not load image.';
+    status.className = 'qr-status err';
+  };
+  img.src = URL.createObjectURL(file);
+}
+
+function onQRDetected(data, source) {
+  _qrFound = true;
+  stopQRCamera();
+  const status = document.getElementById(source === 'camera' ? 'qr-status-camera' : 'qr-status-upload');
+  try {
+    const parsed = parseOTPUri(data);
+    status.textContent = '✓ QR code found!';
+    status.className = 'qr-status ok';
+    setTimeout(() => {
+      closeQRScanner();
+      fillTOTPFromParsed(parsed);
+      toast('QR scanned — review and save.');
+    }, 600);
+  } catch (e) {
+    // QR found but not an OTP URI — show raw and let user handle it
+    status.textContent = 'QR found but not an OTP code: ' + data.slice(0, 60);
+    status.className = 'qr-status err';
+    _qrFound = false;
+    if (source === 'camera') scanQRFrame();
+  }
+}
+
 async function addTOTP() {
   const label = v('totp-label').trim(), secret = v('totp-secret').trim().replace(/\s/g, '').toUpperCase();
   const issuer = v('totp-issuer').trim(), period = parseInt(v('totp-period')) || 30;
@@ -3070,7 +3373,10 @@ const v = id => document.getElementById(id)?.value ?? '';
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 function openModal(name) { document.getElementById(`modal-${name}`).classList.add('open'); }
-function closeModal(name) { document.getElementById(`modal-${name}`).classList.remove('open'); }
+function closeModal(name) {
+  document.getElementById(`modal-${name}`).classList.remove('open');
+  if (name === 'qr-scanner') stopQRCamera();
+}
 document.querySelectorAll('.modal-overlay').forEach(ov => ov.addEventListener('click', e => { if (e.target === ov) ov.classList.remove('open'); }));
 
 function clearIds(...ids) { ids.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; }); }
