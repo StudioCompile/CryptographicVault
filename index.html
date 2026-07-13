@@ -1529,7 +1529,7 @@ body {
         <button class="lock-btn-primary" id="unlock-btn" onclick="unlock()">Unlock vault</button>
         <button class="lock-btn-secondary" id="passkey-btn" onclick="unlockWithPasskey()" style="display:none;margin-top:8px">Use passkey instead</button>
       </div>
-      <div class="lock-link"><button onclick="confirmResetAll()">delete all vault data</button></div>
+      <div class="lock-link"><button onclick="confirmDeleteLockScreenVault()">Delete this vault</button></div>
     </div>
   </div>
 </div>
@@ -2488,6 +2488,24 @@ function deleteVault(id) {
     renderVaultSelector();
     document.getElementById('vault-selector').style.display = '';
     document.getElementById('lockscreen').style.display = 'none';
+    toast('Vault deleted.');
+  };
+  openModal('confirm-delete-vault');
+}
+
+function confirmDeleteLockScreenVault() {
+  const id = _selectedVaultId;
+  if (!id) return;
+  const idx = getIndex();
+  const info = idx.find(v => v.id === id);
+  document.getElementById('confirm-delete-vault-msg').textContent = `"${info?.name || 'this vault'}" and all its data will be permanently deleted from this device.`;
+  document.getElementById('confirm-delete-vault-btn').onclick = () => {
+    closeModal('confirm-delete-vault');
+    deleteVaultData(id);
+    _selectedVaultId = null;
+    document.getElementById('lockscreen').style.display = 'none';
+    document.getElementById('vault-selector').style.display = '';
+    renderVaultSelector();
     toast('Vault deleted.');
   };
   openModal('confirm-delete-vault');
