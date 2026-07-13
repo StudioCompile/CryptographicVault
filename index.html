@@ -3873,6 +3873,10 @@ setTimeout(() => {
       document.getElementById('vault-selector').style.display = 'none';
       document.getElementById('lockscreen').style.display = '';
       renderLockScreen();
+      document.getElementById('import-name').value = obj.name || 'Imported Vault';
+      document.getElementById('import-err').textContent = '';
+      document.getElementById('import-err').classList.remove('show');
+      setTimeout(() => openModal('import-vault'), 50);
       return;
     }
   }
