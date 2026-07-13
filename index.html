@@ -3475,6 +3475,8 @@ function confirmImport() {
   _selectedVaultId = newId;
   history.replaceState(null, '', location.pathname + location.search);
   closeModal('import-vault');
+  document.getElementById('lockscreen').style.display = 'none';
+  document.getElementById('vault-selector').style.display = '';
   renderVaultSelector();
   toast(`"${name}" imported — enter the password to open it.`);
 }
@@ -3861,6 +3863,18 @@ async function saveEditTOTP() {
   renderTOTP();
   toast('2FA code updated.');
 }
+
+window.addEventListener('hashchange', () => {
+  const importEnc = getImportData();
+  if (!importEnc) return;
+  const obj = unpackVault(importEnc);
+  if (!obj || !obj.verifier) return;
+  _pendingImport = obj;
+  document.getElementById('import-name').value = obj.name || 'Imported Vault';
+  document.getElementById('import-err').textContent = '';
+  document.getElementById('import-err').classList.remove('show');
+  openModal('import-vault');
+});
 
 setTheme(localStorage.getItem('vault-theme') || 'dark');
 
