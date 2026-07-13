@@ -81,7 +81,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 
 .vaults-title {
@@ -207,7 +207,7 @@ body {
 
 .lock-header {
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 
 .lock-icon {
@@ -356,7 +356,7 @@ body {
 .app-shell {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 32px 40px 48px;
+  padding: 40px;
 }
 
 .app-header {
@@ -364,7 +364,7 @@ body {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0;
-  padding-bottom: 20px;
+  padding-bottom: 24px;
   gap: 16px;
   border-bottom: 1px solid var(--border);
 }
@@ -935,13 +935,13 @@ body {
 }
 
 .settings-desc {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--muted);
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 
 .settings-section {
-  margin-bottom: 32px;
+  margin-bottom: 16px;
 }
 
 .settings-section-title {
@@ -950,8 +950,8 @@ body {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--muted);
-  margin-bottom: 12px;
-  padding-bottom: 10px;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
   border-bottom: 1px solid var(--border);
 }
 
@@ -959,14 +959,15 @@ body {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 20px;
+  overflow: hidden;
 }
 
 .settings-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 0;
+  gap: 16px;
+  padding: 14px 16px;
   border-bottom: 1px solid var(--border);
 }
 
@@ -976,18 +977,20 @@ body {
 
 .settings-row-info {
   flex: 1;
+  min-width: 0;
 }
 
 .settings-row-label {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   color: var(--text);
   margin-bottom: 2px;
 }
 
 .settings-row-desc {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--muted);
+  line-height: 1.4;
 }
 
 .toggle-group {
@@ -1019,18 +1022,18 @@ body {
 
 /* ══ GLOBAL SETTINGS MODAL ══ */
 .global-settings-modal {
-  max-width: 640px;
+  max-width: 580px;
 }
 
 .global-settings-modal h3 {
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 700;
   letter-spacing: -0.04em;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .global-settings-modal .settings-desc {
-  margin-bottom: 28px;
+  margin-bottom: 24px;
 }
 
 /* ══ MODALS ══ */
@@ -1040,9 +1043,10 @@ body {
   inset: 0;
   background: rgba(0, 0, 0, 0.6);
   z-index: 1000;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  padding: 20px;
+  padding: 16px;
+  overflow-y: auto;
 }
 
 [data-theme="dark"] .modal-overlay {
@@ -1057,11 +1061,13 @@ body {
   background: var(--surface);
   border: 1px solid var(--border2);
   border-radius: var(--radius-lg);
-  padding: 32px;
+  padding: 24px;
   width: 100%;
   max-width: 480px;
   position: relative;
   animation: slide-up 0.12s ease;
+  margin: auto;
+  flex-shrink: 0;
 }
 
 @keyframes slide-up {
@@ -1074,7 +1080,7 @@ body {
   font-weight: 600;
   letter-spacing: -0.02em;
   color: var(--text);
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .modal-close {
@@ -1096,11 +1102,20 @@ body {
   background: var(--bg);
 }
 
+.modal-desc {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
 .modal-footer {
   display: flex;
   gap: 8px;
   justify-content: flex-end;
-  margin-top: 24px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
 }
 
 /* ══ FORMS ══ */
@@ -1478,6 +1493,25 @@ body {
     width: 100%;
     justify-content: flex-end;
   }
+
+  .modal-overlay {
+    align-items: flex-start;
+    padding: 12px 10px;
+  }
+
+  .modal {
+    padding: 18px 16px;
+  }
+
+  .settings-row {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .settings-row > .btn,
+  .settings-row > button {
+    width: 100%;
+  }
 }
 </style>
 </head>
@@ -1661,7 +1695,7 @@ body {
         <label class="form-label">Give it a name</label>
         <input type="text" id="cv-name" class="form-input" placeholder="e.g. Personal, Work…" autocomplete="off">
       </div>
-      <p style="font-size:13px;color:var(--muted);margin-bottom:12px">How do you want to unlock it?</p>
+      <p class="modal-desc">How do you want to unlock it?</p>
       <div class="method-option" id="mb-pw" onclick="pickMethod('password')">
         <div class="method-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg></div>
         <div>
@@ -1701,7 +1735,7 @@ body {
       </div>
     </div>
     <div id="cv-step-pk" style="display:none">
-      <p style="font-size:13px;color:var(--muted);margin-bottom:10px" id="pk-info-text">
+      <p class="modal-desc" id="pk-info-text">
         Your device will ask you to confirm with your fingerprint, Face ID, or PIN.
       </p>
       <div id="pk-status" style="font-size:12px;color:var(--muted);min-height:18px"></div>
@@ -1720,7 +1754,7 @@ body {
   <div class="modal">
     <button class="modal-close" onclick="closeModal('add-totp')">✕</button>
     <h3>Add a 2FA code</h3>
-    <div style="display:flex;gap:8px;margin-bottom:20px">
+    <div style="display:flex;gap:8px;margin-bottom:16px">
       <button class="btn btn-outline" style="flex:1" onclick="openQRScanner()">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="3" height="3"/><rect x="19" y="14" width="2" height="2"/><rect x="14" y="19" width="2" height="2"/><rect x="19" y="19" width="2" height="2"/></svg>
         Scan QR code
@@ -1799,7 +1833,7 @@ body {
   <div class="modal" style="max-width:420px">
     <button class="modal-close" onclick="closeModal('uri-entry')">✕</button>
     <h3>Paste OTP URI</h3>
-    <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Paste an <code style="font-family:var(--mono);font-size:12px;background:var(--surface-2);padding:2px 5px;border-radius:2px">otpauth://</code> URI — you can get one by exporting from another authenticator app or copying the link from a QR code.</p>
+    <p class="modal-desc">Paste an <code style="font-family:var(--mono);font-size:12px;background:var(--surface-2);padding:2px 5px;border-radius:2px">otpauth://</code> URI — you can get one by exporting from another authenticator app or copying the link from a QR code.</p>
     <div class="form-group">
       <label class="form-label">OTP URI</label>
       <input type="text" id="uri-input" class="form-input" placeholder="otpauth://totp/GitHub?secret=..." autocomplete="off" spellcheck="false" style="font-family:var(--mono);font-size:12px">
@@ -1847,7 +1881,7 @@ body {
     <button class="modal-close" onclick="closeModal('view-note');wipeItemView()">✕</button>
     <h3 id="view-note-title">Item</h3>
     <div id="view-note-pw-section">
-      <p style="font-size:13px;color:var(--muted);margin-bottom:12px">This item has an extra passcode. Enter it to continue.</p>
+      <p class="modal-desc">This item has an extra passcode. Enter it to continue.</p>
       <div class="form-group">
         <label class="form-label">Extra passcode</label>
         <input type="password" id="view-note-pw" class="form-input" placeholder="Enter extra passcode…"
@@ -1856,7 +1890,7 @@ body {
           onkeydown="if(event.key==='Enter')decryptAndShowItem()">
       </div>
       <div class="form-error" id="view-note-err"></div>
-      <div class="modal-footer" style="margin-top:12px">
+      <div class="modal-footer">
         <button class="btn btn-ghost" onclick="closeModal('view-note')">Cancel</button>
         <button class="btn btn-primary" onclick="decryptAndShowItem()">Unlock</button>
       </div>
@@ -1876,7 +1910,7 @@ body {
 <div class="modal-overlay" id="modal-confirm-delete">
   <div class="modal">
     <h3>Delete this?</h3>
-    <p style="font-size:13px;color:var(--muted);margin-bottom:20px">This can't be undone.</p>
+    <p class="modal-desc">This can't be undone.</p>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('confirm-delete')">Keep it</button>
       <button class="btn btn-danger" id="confirm-delete-btn">Delete</button>
@@ -1889,7 +1923,7 @@ body {
   <div class="modal">
     <button class="modal-close" onclick="closeModal('share-link')">✕</button>
     <h3>Share vault</h3>
-    <p style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.7">
+    <p class="modal-desc">
       Copy this link and open it on another device. Your vault password is still required — the link alone cannot unlock your data.
     </p>
     <div class="form-group">
@@ -1915,12 +1949,12 @@ body {
       <label class="form-label">Name</label>
       <input type="text" id="settings-name-modal" class="form-input" placeholder="e.g. Personal, Work…" autocomplete="off">
     </div>
-    <div style="margin-bottom:16px">
-      <button class="btn btn-outline btn-full" style="width:100%" onclick="openCredentialChange()">Change unlock method</button>
+    <div class="form-group">
+      <button class="btn btn-outline" style="width:100%" onclick="openCredentialChange()">Change unlock method</button>
     </div>
-    <div style="border-top:1px solid var(--border);padding-top:16px">
-      <p style="font-size:13px;color:var(--muted);margin-bottom:12px">Delete vault</p>
-      <button class="btn btn-danger btn-full" style="width:100%" onclick="confirmDeleteCurrentVault()">Delete this vault</button>
+    <div class="form-group" style="border-top:1px solid var(--border);padding-top:16px;margin-bottom:0">
+      <p class="modal-desc" style="margin-bottom:8px">Permanently erase this vault from this device.</p>
+      <button class="btn btn-danger" style="width:100%" onclick="confirmDeleteCurrentVault()">Delete this vault</button>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('vault-settings')">Close</button>
@@ -1935,7 +1969,7 @@ body {
     <button class="modal-close" onclick="closeModal('change-credential');resetCredFlow()">✕</button>
     <h3 id="cred-modal-title">Change how you unlock</h3>
     <div id="cred-step-verify">
-      <p style="font-size:13px;color:var(--muted);margin-bottom:14px" id="cred-verify-hint">
+      <p class="modal-desc" id="cred-verify-hint">
         First, confirm it's you by entering your current password.
       </p>
       <div id="cred-verify-pw-row" class="form-group">
@@ -1952,7 +1986,7 @@ body {
       </div>
     </div>
     <div id="cred-step-pick" style="display:none">
-      <p style="font-size:13px;color:var(--muted);margin-bottom:14px">
+      <p class="modal-desc">
         Confirmed. Now choose how you want to unlock this vault:
       </p>
       <div class="method-option" id="cred-mb-pw" onclick="pickCredMethod('password')">
@@ -1994,7 +2028,7 @@ body {
       </div>
     </div>
     <div id="cred-step-pk" style="display:none">
-      <p style="font-size:13px;color:var(--muted);margin-top:14px" id="cred-pk-info-text">
+      <p class="modal-desc" style="margin-top:16px" id="cred-pk-info-text">
         Your device will ask you to set up a passkey when you click Apply.
       </p>
       <div style="font-size:12px;color:var(--muted);min-height:18px" id="cred-pk-status"></div>
@@ -2012,8 +2046,8 @@ body {
 <div class="modal-overlay" id="modal-confirm-delete-vault">
   <div class="modal">
     <h3>Delete vault?</h3>
-    <p style="font-size:13px;color:var(--muted);margin-bottom:8px" id="confirm-delete-vault-msg"></p>
-    <p style="font-size:12px;color:var(--red);margin-bottom:20px">This can't be undone.</p>
+    <p class="modal-desc" id="confirm-delete-vault-msg"></p>
+    <p class="modal-desc" style="color:var(--red)">This can't be undone.</p>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('confirm-delete-vault')">Keep it</button>
       <button class="btn btn-danger" id="confirm-delete-vault-btn">Delete</button>
@@ -2093,8 +2127,8 @@ body {
 <div class="modal-overlay" id="modal-confirm-reset-all">
   <div class="modal">
     <h3>Delete everything?</h3>
-    <p style="font-size:13px;color:var(--muted);margin-bottom:8px">This will permanently delete all your vaults and everything in them from this device.</p>
-    <p style="font-size:12px;color:var(--red);margin-bottom:20px">There's no way to undo this.</p>
+    <p class="modal-desc">This will permanently delete all your vaults and everything in them from this device.</p>
+    <p class="modal-desc" style="color:var(--red)">There's no way to undo this.</p>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeModal('confirm-reset-all')">Cancel</button>
       <button class="btn btn-danger" onclick="doResetAll()">Delete everything</button>
@@ -2106,7 +2140,7 @@ body {
 <div class="modal-overlay" id="modal-session-expired">
   <div class="modal">
     <h3>You've been logged out</h3>
-    <p style="font-size:13px;color:var(--muted);margin-bottom:20px" id="session-expired-msg">Your vault was locked for security.</p>
+    <p class="modal-desc" id="session-expired-msg">Your vault was locked for security.</p>
     <div class="modal-footer">
       <button class="btn btn-primary" style="width:100%" onclick="closeModal('session-expired')">Got it</button>
     </div>
@@ -2118,7 +2152,7 @@ body {
   <div class="modal">
     <button class="modal-close" onclick="closeModal('import-vault');_pendingImport=null;history.replaceState(null,'',location.pathname+location.search)">✕</button>
     <h3>Add shared vault</h3>
-    <p style="font-size:13px;color:var(--muted);margin-bottom:16px">
+    <p class="modal-desc">
       Someone shared a vault with you. Give it a name so you can tell it apart from your others.
     </p>
     <div class="form-group">
